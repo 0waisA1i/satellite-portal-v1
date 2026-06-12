@@ -1,0 +1,90 @@
+{
+  "_comment": "Sample data in the standardized Stage 7 shape. Use for UI development before the live Supabase connection is wired. One account per signal. Replace with live data from Owais's Supabase once connected. No real client data here.",
+  "client": { "id": "demo", "name": "Acme Energy", "code": "AE", "accent": "lime" },
+  "subscription": { "tier": "feed", "segment_limit": 1, "signal_cap": 5, "enrich_enabled": false, "outreach_enabled": false, "slack_enabled": false, "current_period": "2026-06" },
+  "signals": [
+    {
+      "signal_id": "AE-001",
+      "archetype": "Regulatory Enforcement",
+      "account": { "name": "Northwind Operating Co.", "sector": "Upstream oil & gas", "geo": "New Mexico" },
+      "title": "NM Methane Waste Rule enforcement notice",
+      "trigger_label": "Enforcement notice",
+      "why_now": "180-day capture deadline",
+      "summary": "Unresolved alleged violations of the state Methane Waste Rule, set for a merits hearing. State regulation requires 98% gas capture by Dec 31, 2026, with permit suspension as the non-compliance penalty.",
+      "signal_intelligence": "Open enforcement docket naming the operator. Capture-rule citation is explicit, not generic ESG language. Usable as a template for similar operators trailing the deadline.",
+      "suggested_next_step": "Pull the operator's monthly waste report. Confirm single vs multi-state footprint. Approach EHS lead with a zero-vent pneumatic brief tied to the capture deadline.",
+      "target_titles": ["VP / Director EHS", "Regulatory Compliance Counsel"],
+      "outreach_angle": "Lead with the Dec 31 98% capture deadline and the permit-suspension penalty. Position as the fastest documented path to compliance.",
+      "false_positive_filter": "Policy news with no named operator; old dockets past hearing date.",
+      "rank_boost_flags": ["Specific compliance deadline (180d)", "Pneumatic source language explicit", "Regulatory hot zone", "Enforcement posture"],
+      "confidence_current": 91,
+      "deadline_date": "2026-12-31",
+      "act_within_days": 90,
+      "est_volume": "8 to 12 / mo",
+      "status": "active",
+      "source_url": "https://example.gov/ocd/docket",
+      "source_verified": true,
+      "surfaced": true,
+      "surfaced_period": "2026-06",
+      "contacts": [
+        { "name": "Dana Whitfield", "title": "VP, Environmental Health & Safety", "email": "d.•••@northwind-op.com", "linkedin_url": "https://linkedin.com/in/..." },
+        { "name": "Marcus Reyes", "title": "Regulatory Compliance Counsel", "email": "m.•••@northwind-op.com", "linkedin_url": "https://linkedin.com/in/..." }
+      ]
+    },
+    {
+      "signal_id": "AE-002",
+      "archetype": "Permit / Project Filing",
+      "account": { "name": "Cascade Resources LLC", "sector": "Upstream oil & gas", "geo": "Permian" },
+      "title": "New 6-well horizontal program filing",
+      "trigger_label": "New permit filed",
+      "why_now": "Q3 spud window",
+      "summary": "New compulsory pooling filing for a 6-well horizontal program in an active Permian county. Operator re-confirmed active with a fresh program after a prior 12-well filing earlier in the year.",
+      "signal_intelligence": "Named, dated asset filing. Scale and location are specific enough to anchor outreach. Confidence reset on re-detection in the latest docket.",
+      "suggested_next_step": "Pull the case files. Approach the sustainability lead with a zero-vent brief tied to the capture deadline. Cross-reference permits in adjacent states to size the account.",
+      "target_titles": ["VP / Director Sustainability", "Director Completions"],
+      "outreach_angle": "Tie the new 6-well pad to zero-vent pneumatics ahead of the 98% capture rule. Reference the asset by name.",
+      "false_positive_filter": "Deadline-extension cases with no new pad; permits already drilled.",
+      "rank_boost_flags": ["Basin distribution footprint", "Regulatory hot zone", "Project asset scale (6 wells)", "Compliance deadline (180d)"],
+      "confidence_current": 88,
+      "deadline_date": "2026-09-15",
+      "act_within_days": 45,
+      "est_volume": "15 to 25 / mo",
+      "status": "active",
+      "source_url": "https://example.gov/ocd/hba-docket",
+      "source_verified": true,
+      "surfaced": true,
+      "surfaced_period": "2026-06",
+      "contacts": [
+        { "name": "Priya Anand", "title": "Director, Sustainability", "email": "p.•••@cascaderes.com", "linkedin_url": "https://linkedin.com/in/..." }
+      ]
+    },
+    {
+      "signal_id": "AE-005",
+      "archetype": "Capacity / Infrastructure RFP",
+      "account": { "name": "Harbor Grid Company", "sector": "Electric utility, T&D", "geo": "US" },
+      "title": "Open grid-modernization RFP",
+      "trigger_label": "Open RFP",
+      "why_now": "RFP closes Aug 15",
+      "summary": "Issued an open RFP for grid-modernization and capacity work with a fixed August close date and named technical line items.",
+      "signal_intelligence": "Dated, open procurement with named scope. Highest-intent signal type: an active buying process, not a leading indicator.",
+      "suggested_next_step": "Confirm bidder eligibility. Map capabilities to the RFP's named line items. Engage the procurement lead before close.",
+      "target_titles": ["Director Grid Modernization", "Procurement Lead"],
+      "outreach_angle": "Map your solution to the named RFP line items before the Aug 15 close. Get on the bidder list now.",
+      "false_positive_filter": "Press releases announcing intent with no procurement action; RFPs already closed.",
+      "rank_boost_flags": ["Open dated RFP", "Named technical scope", "Procurement action confirmed", "Budget implied"],
+      "confidence_current": 85,
+      "deadline_date": "2026-08-15",
+      "act_within_days": 68,
+      "est_volume": "5 to 9 / mo",
+      "status": "active",
+      "source_url": "https://example.com/rfp",
+      "source_verified": true,
+      "surfaced": true,
+      "surfaced_period": "2026-06",
+      "contacts": [
+        { "name": "Raymond Cho", "title": "Director, Grid Modernization", "email": "r.•••@harborgrid.com", "linkedin_url": "https://linkedin.com/in/..." },
+        { "name": "Aisha Bello", "title": "Senior Procurement Lead", "email": "a.•••@harborgrid.com", "linkedin_url": "https://linkedin.com/in/..." }
+      ]
+    }
+  ]
+}

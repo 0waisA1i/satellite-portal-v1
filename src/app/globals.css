@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+/* Satellite brand tokens (dark mode only). Source: CLAUDE.md + docs/Satellite_Portal_Mockup.html */
+:root {
+  /* per-client accent, swapped at runtime by the layout (lime default) */
+  --accent: #ecfd95;
+}
+
+@theme inline {
+  --color-background: #000000;
+  --color-foreground: #ffffff;
+
+  --color-lime: #ecfd95;
+  --color-mint: #cbf3ba;
+  --color-cyan: #40e3fd;
+  --color-grey: #c1c1c1;
+  --color-alert: #ff8585;
+  --color-accent: var(--accent);
+
+  --color-panel: rgba(255, 255, 255, 0.035);
+  --color-panel-2: rgba(255, 255, 255, 0.055);
+  --color-line: rgba(255, 255, 255, 0.09);
+  --color-line-2: rgba(255, 255, 255, 0.14);
+  --color-txt-2: rgba(255, 255, 255, 0.72);
+  --color-txt-3: rgba(255, 255, 255, 0.45);
+  --color-txt-4: rgba(255, 255, 255, 0.28);
+
+  --font-sans: var(--font-dm-sans), -apple-system, sans-serif;
+  --font-serif: var(--font-instrument-serif), serif;
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: rgba(236, 253, 149, 0.2);
+}
