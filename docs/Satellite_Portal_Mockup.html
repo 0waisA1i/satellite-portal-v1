@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Satellite Portal — CGL × Acme</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..800;1,9..40,300..800&family=Instrument+Serif:ital@0;1&display=swap');
+
+:root{
+  --bg:#000; --panel:rgba(255,255,255,0.035); --panel-2:rgba(255,255,255,0.055);
+  --line:rgba(255,255,255,0.09); --line-2:rgba(255,255,255,0.14);
+  --txt:#fff; --txt-2:rgba(255,255,255,0.72); --txt-3:rgba(255,255,255,0.45); --txt-4:rgba(255,255,255,0.28);
+  --lime:#ECFD95; --mint:#CBF3BA; --cyan:#40E3FD; --grey:#C1C1C1; --red:#FF8585;
+  --accent:var(--lime);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);font-family:'DM Sans',-apple-system,BlinkMacSystemFont,sans-serif;color:var(--txt);-webkit-font-smoothing:antialiased}
+body{min-height:100vh}
+em.serif{font-family:'Instrument Serif',serif;font-style:italic;font-weight:400}
+a{color:inherit}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+::selection{background:rgba(236,253,149,.2)}
+
+/* ---------- top bar ---------- */
+.topbar{position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-content:space-between;
+  padding:0 26px;height:58px;background:rgba(0,0,0,.82);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.tb-left{display:flex;align-items:center;gap:16px}
+.brand{display:flex;align-items:center;gap:9px}
+.brand svg{height:26px;width:26px}
+.brand .b-name{font-size:15px;font-weight:700;letter-spacing:-0.01em}
+.brand .b-sat{font-size:15px;font-weight:600;color:var(--accent);letter-spacing:-0.01em}
+.brand .b-by{font-size:9px;font-weight:600;color:var(--txt-3);letter-spacing:.14em;text-transform:uppercase;margin-left:2px;border-left:1px solid var(--line-2);padding-left:10px}
+.client-switch{position:relative}
+.cs-btn{display:flex;align-items:center;gap:9px;padding:7px 12px;border-radius:9px;background:var(--panel);border:1px solid var(--line);font-size:13px;font-weight:600}
+.cs-btn .cs-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 9px var(--accent)}
+.cs-btn .chev{color:var(--txt-3);font-size:10px;margin-left:2px}
+.cs-menu{position:absolute;top:46px;left:0;min-width:240px;background:#0b0b0b;border:1px solid var(--line-2);border-radius:12px;padding:6px;box-shadow:0 20px 60px rgba(0,0,0,.8);display:none;z-index:60}
+.cs-menu.open{display:block}
+.cs-item{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:8px;font-size:13px;font-weight:500;width:100%;text-align:left}
+.cs-item:hover{background:var(--panel)}
+.cs-item .ci-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.cs-item .ci-tier{margin-left:auto;font-size:8.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--txt-3)}
+.tb-right{display:flex;align-items:center;gap:14px}
+.tier-badge{display:inline-flex;align-items:center;gap:7px;padding:6px 13px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  background:rgba(236,253,149,.1);color:var(--accent);border:1px solid rgba(236,253,149,.24)}
+.tier-badge .tb-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent)}
+.avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#2a2a2a,#111);border:1px solid var(--line-2);
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--txt-2)}
+
+/* ---------- demo control strip ---------- */
+.demo-bar{display:flex;align-items:center;gap:14px;justify-content:center;padding:10px 26px;background:rgba(236,253,149,.04);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.demo-lbl{font-size:9.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--txt-3)}
+.seg{display:flex;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px}
+.seg button{padding:6px 16px;border-radius:7px;font-size:12px;font-weight:600;color:var(--txt-3);letter-spacing:.01em;transition:.15s}
+.seg button.on{background:var(--accent);color:#000}
+.demo-note{font-size:11px;color:var(--txt-4)}
+
+/* ---------- layout ---------- */
+.wrap{max-width:1180px;margin:0 auto;padding:30px 26px 90px}
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:8px}
+.ph-left{display:flex;flex-direction:column;gap:7px}
+.eyebrow{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(236,253,149,.7)}
+.ph-title{font-size:34px;font-weight:600;letter-spacing:-0.025em;line-height:1}
+.ph-title em{color:var(--accent)}
+.ph-sub{font-size:13.5px;color:var(--txt-3);max-width:560px;line-height:1.5}
+.stat-strip{display:flex;gap:10px}
+.ss{padding:11px 16px;border-radius:11px;background:var(--panel);border:1px solid var(--line);text-align:center;min-width:84px}
+.ss-val{font-size:23px;font-weight:700;letter-spacing:-0.02em;line-height:1}
+.ss-val em{font-size:19px;color:var(--accent)}
+.ss-lbl{font-size:7.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--txt-3);margin-top:5px}
+
+.feed-meta{display:flex;align-items:center;gap:10px;margin:24px 0 16px}
+.feed-meta .fm-line{flex:1;height:1px;background:var(--line)}
+.feed-meta .fm-txt{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--txt-3)}
+
+/* ---------- signal card ---------- */
+.cards{display:flex;flex-direction:column;gap:14px}
+.card{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;transition:.2s}
+.card:hover{border-color:var(--line-2);background:rgba(255,255,255,.05)}
+.card .stripe{position:absolute;left:0;top:0;bottom:0;width:3px;z-index:2}
+.card-in{padding:18px 22px 16px 24px}
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:18px}
+.ct-left{flex:1;min-width:0}
+.badges{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:9px}
+.b-arch{padding:3px 11px;border-radius:99px;font-size:9.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase}
+.b-tier{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:99px;font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.b-tier.gold{background:rgba(236,253,149,.1);color:var(--lime);border:1px solid rgba(236,253,149,.22)}
+.b-tier.silver{background:rgba(193,193,193,.07);color:rgba(193,193,193,.8);border:1px solid rgba(193,193,193,.18)}
+.b-tier .d{width:5px;height:5px;border-radius:50%}
+.b-status{padding:3px 9px;border-radius:99px;font-size:8.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.b-status.active{background:rgba(203,243,186,.1);color:var(--mint);border:1px solid rgba(203,243,186,.2)}
+.b-status.stale{background:rgba(255,184,108,.1);color:#FFB86C;border:1px solid rgba(255,184,108,.2)}
+.co-name{font-size:20px;font-weight:600;letter-spacing:-0.015em;line-height:1.15}
+.co-tag{font-size:12.5px;color:var(--txt-2);margin-top:3px;line-height:1.4}
+.trigger-row{display:flex;align-items:center;gap:9px;margin-top:11px;flex-wrap:wrap}
+.trigger-chip{font-size:9.5px;font-weight:600;color:var(--txt-2);padding:3px 10px;border-radius:99px;border:1px solid var(--line-2);background:var(--panel);letter-spacing:.05em;text-transform:uppercase}
+.whynow{font-size:9.5px;color:var(--txt-3)}
+.whynow b{color:var(--accent);font-weight:700;letter-spacing:.04em}
+.ct-stats{display:flex;gap:7px;flex-shrink:0}
+.chip{padding:9px 14px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--line);text-align:center;min-width:66px}
+.chip-val{font-size:18px;font-weight:700;letter-spacing:-0.02em;line-height:1;display:block}
+.chip-val.accent{color:var(--accent)}
+.chip-lbl{font-size:6.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--txt-3);display:block;margin-top:4px}
+
+.card-mid{display:flex;align-items:center;gap:12px;margin-top:15px;padding-top:14px;border-top:1px solid var(--line)}
+.urg{padding:5px 13px;border-radius:99px;font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;flex-shrink:0}
+.urg-now{background:rgba(236,253,149,.11);color:var(--lime);border:1px solid rgba(236,253,149,.24)}
+.urg-mint{background:rgba(203,243,186,.1);color:var(--mint);border:1px solid rgba(203,243,186,.22)}
+.urg-cyan{background:rgba(64,227,253,.09);color:var(--cyan);border:1px solid rgba(64,227,253,.22)}
+.urg-plan{background:rgba(193,193,193,.08);color:var(--grey);border:1px solid rgba(193,193,193,.18)}
+
+/* decision maker block */
+.dm{flex:1;min-width:0}
+.dm-hdr{font-size:8px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--txt-3);margin-bottom:4px}
+.dm-titles{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.dm-pill{font-size:11px;font-weight:500;color:var(--txt);padding:3px 9px;border-radius:7px;background:rgba(255,255,255,.05);border:1px solid var(--line)}
+.dm-angle{font-size:11px;color:var(--txt-2);line-height:1.4;margin-top:6px}
+.dm-angle b{color:#fff;font-weight:600}
+/* enriched contacts (stack+) */
+.contact{display:flex;align-items:center;gap:10px;padding:7px 0;border-top:1px solid var(--line)}
+.contact:first-of-type{border-top:none}
+.c-av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#222,#0d0d0d);border:1px solid var(--line-2);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--txt-2);flex-shrink:0}
+.c-name{font-size:12.5px;font-weight:600}
+.c-title{font-size:10.5px;color:var(--txt-3)}
+.c-meta{margin-left:auto;display:flex;gap:8px;align-items:center}
+.c-tag{font-size:9px;color:var(--txt-3);font-family:monospace}
+.c-li{font-size:9px;font-weight:700;letter-spacing:.06em;color:var(--cyan);text-decoration:none}
+
+.card-actions{display:flex;align-items:center;gap:9px;margin-top:15px;padding-top:14px;border-top:1px solid var(--line);flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 15px;border-radius:9px;font-size:12px;font-weight:600;transition:.15s}
+.btn svg{width:14px;height:14px}
+.btn-ghost{background:var(--panel);border:1px solid var(--line-2);color:var(--txt)}
+.btn-ghost:hover{background:var(--panel-2);border-color:rgba(255,255,255,.28)}
+.btn-accent{background:var(--accent);color:#000}
+.btn-accent:hover{filter:brightness(1.08)}
+.btn-lock{background:rgba(255,255,255,.025);border:1px dashed var(--line-2);color:var(--txt-4);cursor:not-allowed}
+.btn-lock svg{opacity:.6}
+.lock-tip{position:relative}
+.lock-tip .tip{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);white-space:nowrap;
+  background:#0b0b0b;border:1px solid var(--line-2);border-radius:8px;padding:7px 11px;font-size:10px;font-weight:600;
+  color:var(--accent);opacity:0;pointer-events:none;transition:.15s;box-shadow:0 12px 30px rgba(0,0,0,.7);letter-spacing:.02em}
+.lock-tip:hover .tip{opacity:1}
+.src-link{margin-left:auto;font-size:9px;color:var(--accent);text-decoration:none;letter-spacing:.03em;white-space:nowrap}
+.src-link::before{content:'SOURCE → ';font-weight:700;letter-spacing:.1em;color:var(--txt-4)}
+.fp-flag{font-size:8.5px;color:var(--txt-3);display:flex;gap:6px;align-items:baseline;margin-top:11px;line-height:1.4}
+.fp-flag .fp-lbl{font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--red);flex-shrink:0}
+
+/* ---------- archetype rail + strength + act pill ---------- */
+.card-flex{display:flex;align-items:stretch}
+.arch-rail{flex:0 0 152px;border-left:3px solid var(--ac);border-right:1px solid var(--line);
+  padding:18px 16px;display:flex;flex-direction:column;justify-content:space-between;gap:18px;
+  background:rgba(255,255,255,.02)}
+.rail-arch{font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ac);line-height:1.3}
+.rs-lbl{font-size:7.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--txt-3);margin-bottom:5px}
+.rs-val{font-size:21px;font-weight:700;letter-spacing:-0.02em;line-height:1}
+.rs-val span{font-size:11px;color:var(--txt-3);font-weight:500}
+.strength-bar{height:6px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden;margin-top:7px}
+.strength-bar i{display:block;height:100%;border-radius:99px}
+.card-main{flex:1;min-width:0;padding:18px 22px 16px}
+.act-pill{padding:5px 13px;border-radius:99px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;flex-shrink:0;display:inline-flex;align-items:center;gap:7px}
+.act-pill::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor}
+.act-urgent{background:rgba(236,253,149,.11);color:var(--lime);border:1px solid rgba(236,253,149,.24)}
+.act-soon{background:rgba(203,243,186,.1);color:var(--mint);border:1px solid rgba(203,243,186,.22)}
+.act-plan{background:rgba(64,227,253,.09);color:var(--cyan);border:1px solid rgba(64,227,253,.22)}
+
+/* ---------- locked / blurred ---------- */
+.card.locked .card-flex{filter:blur(6px);opacity:.55;pointer-events:none;user-select:none}
+.lock-overlay{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:11px;
+  background:radial-gradient(ellipse at center,rgba(0,0,0,.35),rgba(0,0,0,.72))}
+.lock-overlay .lk-ic{width:34px;height:34px;color:var(--accent);opacity:.85}
+.lock-overlay .lk-t{font-size:14px;font-weight:600}
+.lock-overlay .lk-s{font-size:11.5px;color:var(--txt-3);max-width:300px;text-align:center;line-height:1.45}
+.lock-overlay .btn-accent{margin-top:3px}
+
+/* ---------- upgrade banner row ---------- */
+.upsell{margin-top:22px;border-radius:14px;border:1px solid rgba(236,253,149,.22);background:linear-gradient(135deg,rgba(236,253,149,.06),rgba(64,227,253,.04));
+  padding:22px 24px;display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.upsell .us-l{flex:1;min-width:240px}
+.upsell .us-t{font-size:17px;font-weight:600;letter-spacing:-0.01em}
+.upsell .us-t em{color:var(--accent)}
+.upsell .us-s{font-size:12.5px;color:var(--txt-2);margin-top:6px;line-height:1.5}
+.upsell .us-feats{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.us-feat{font-size:10px;font-weight:600;color:var(--txt-2);padding:4px 10px;border-radius:99px;background:rgba(255,255,255,.05);border:1px solid var(--line)}
+.us-feat.locked{color:var(--txt-4)}
+.us-feat.locked::before{content:'🔒 ';filter:grayscale(1);font-size:8px}
+
+/* ---------- slide-over detail ---------- */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(3px);z-index:80;opacity:0;pointer-events:none;transition:.25s}
+.scrim.open{opacity:1;pointer-events:auto}
+.sheet{position:fixed;top:0;right:0;bottom:0;width:min(560px,94vw);background:#0a0a0a;border-left:1px solid var(--line-2);
+  z-index:90;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);overflow-y:auto;box-shadow:-30px 0 80px rgba(0,0,0,.7)}
+.sheet.open{transform:translateX(0)}
+.sheet-stripe{height:3px;width:100%}
+.sheet-head{padding:22px 26px 18px;border-bottom:1px solid var(--line)}
+.sh-close{position:absolute;top:18px;right:22px;width:30px;height:30px;border-radius:8px;background:var(--panel);border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--txt-2)}
+.sh-close:hover{background:var(--panel-2)}
+.sheet-body{padding:8px 26px 40px}
+.sec{padding:18px 0;border-bottom:1px solid var(--line)}
+.sec-hdr{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--txt-3);margin-bottom:9px;display:flex;align-items:center;gap:8px}
+.sec-hdr .num{font-family:'Instrument Serif',serif;font-style:italic;color:rgba(236,253,149,.7);font-size:15px}
+.sec-body{font-size:13.5px;line-height:1.6;color:var(--txt)}
+.sec-body.muted{color:var(--txt-2)}
+.kv{display:grid;grid-template-columns:130px 1fr;gap:8px 16px;font-size:12.5px}
+.kv dt{color:var(--txt-3);font-weight:600}
+.kv dd{color:var(--txt)}
+.flags{display:flex;flex-wrap:wrap;gap:6px}
+.flag{font-size:10px;font-weight:600;color:var(--mint);padding:4px 9px;border-radius:7px;background:rgba(203,243,186,.07);border:1px solid rgba(203,243,186,.16)}
+.decaybar{height:7px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:8px}
+.decaybar i{display:block;height:100%;border-radius:99px;background:var(--accent)}
+
+@media (max-width:760px){
+  .card-flex{flex-direction:column}
+  .arch-rail{flex-direction:row;align-items:center;justify-content:space-between;border-right:none;border-bottom:1px solid var(--line);flex-basis:auto}
+  .card-top{flex-direction:column}.ct-stats{width:100%;justify-content:space-between}
+  .card-mid{flex-direction:column;align-items:flex-start}.page-head{flex-direction:column;align-items:flex-start}
+  .stat-strip{width:100%;justify-content:space-between}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="tb-left">
+    <div class="brand">
+      <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#c0)"><path d="M21.95 43.48C34.07 43.48 43.9 33.88 43.9 22.03 43.9 10.19 34.07.59 21.95.59 9.83.59.01 10.19.01 22.03.01 33.88 9.83 43.48 21.95 43.48Z" fill="#fff"/><path d="M32.16 12.82c2.04-1.33-24.78-2.25-19.95 15.95 1.55-3.27 4.16-4.98 6.2-7.24.36-.4-3.92 1.14-3.56.78 2.5-3.68 10.17-6.8 8.72-5.79-1.45 1.01-2.88 1.88-3.6 3.32-.65.77 3.55-.96 3.01-.36-3.45 1.91-6.79 7.68-7.42 12.43h1.4s8.12-.56 10.96-6.01c2.83-5.45 2.2-11.74 4.24-13.07Z" fill="#000"/></g><defs><clipPath id="c0"><rect width="44" height="43" fill="#fff" transform="translate(0 .5)"/></clipPath></defs></svg>
+      <span class="b-name">Satellite</span>
+      <span class="b-by">CleanTech GrowthLab</span>
+    </div>
+    <div class="client-switch">
+      <button class="cs-btn" id="csBtn"><span class="cs-dot"></span><span id="csName">Acme Energy</span><span class="chev">▾</span></button>
+      <div class="cs-menu" id="csMenu"></div>
+    </div>
+  </div>
+  <div class="tb-right">
+    <span class="tier-badge"><span class="tb-dot"></span><span id="tierLabel">Signal Feed</span></span>
+    <div class="avatar">AE</div>
+  </div>
+</div>
+
+<!-- DEMO CONTROL -->
+<div class="demo-bar">
+  <span class="demo-lbl">Preview tier</span>
+  <div class="seg" id="tierSeg">
+    <button data-tier="feed" class="on">Signal Feed</button>
+    <button data-tier="stack">Signal Stack</button>
+    <button data-tier="command">Signal Command</button>
+  </div>
+  <span class="demo-note">Demo control — toggle to see what each subscription tier unlocks</span>
+</div>
+
+<div class="wrap">
+  <div class="page-head">
+    <div class="ph-left">
+      <span class="eyebrow">Signal Feed · <span id="periodLbl">June 2026</span></span>
+      <h1 class="ph-title">This month's <em>buying signals</em></h1>
+      <p class="ph-sub" id="phSub"></p>
+    </div>
+    <div class="stat-strip" id="statStrip"></div>
+  </div>
+
+  <div class="feed-meta"><span class="fm-txt" id="feedMetaTxt">Surfaced signals</span><span class="fm-line"></span></div>
+  <div class="cards" id="cards"></div>
+  <div id="upsellSlot"></div>
+</div>
+
+<!-- DETAIL SHEET -->
+<div class="scrim" id="scrim"></div>
+<aside class="sheet" id="sheet">
+  <div class="sheet-stripe" id="sheetStripe"></div>
+  <div class="sheet-head">
+    <button class="sh-close" id="shClose">×</button>
+    <div id="sheetHead"></div>
+  </div>
+  <div class="sheet-body" id="sheetBody"></div>
+</aside>
+
+<script>
+/* ============== DATA — generic "Acme" clients, one account per signal ============== */
+const TIERS = {
+  feed:    {label:'Signal Feed',    cap:5,  enrich:false, outreach:false, slack:false},
+  stack:   {label:'Signal Stack',   cap:99, enrich:true,  outreach:true,  slack:false},
+  command: {label:'Signal Command', cap:99, enrich:true,  outreach:true,  slack:true}
+};
+const ACCENTS = {lime:'#ECFD95',mint:'#CBF3BA',cyan:'#40E3FD',grey:'#C1C1C1'};
+
+function mkSignal(o){return Object.assign({status:'active',volume:'',flags:[],contacts:[]},o);}
+
+const CLIENTS = {
+  acme_energy:{
+    name:'Acme Energy', code:'AE', accent:'lime',
+    sub:'Upstream & midstream operators in active US regulatory hot zones. Each signal is one named account with a live timing trigger.',
+    signals:[
+      mkSignal({id:'AE-001',arch:'Regulatory Enforcement',accent:'lime',tier:'gold',company:'Northwind Operating Co.',
+        sector:'Upstream oil & gas · New Mexico', trigger:'Enforcement notice', whynow:'180-day capture deadline',
+        conf:91, deadline:'Dec 31', volume:'8–12 / mo', urg:'urg-now', urgTxt:'Act this quarter',
+        titles:['VP / Director EHS','Regulatory Compliance Counsel'],
+        angle:'Lead with the <b>Dec 31 98% capture deadline</b> and the APD-suspension penalty. Position as the fastest documented path to compliance.',
+        summary:'Unresolved alleged violations of the state Methane Waste Rule and four related sections, set for a merits hearing. State regulation requires 98% gas capture by Dec 31, 2026, with permit suspension as the non-compliance penalty.',
+        intel:'Open enforcement docket naming the operator. Capture-rule citation is explicit, not generic ESG language. Operator is single-state, mid-size — usable as a template for similar operators trailing the deadline.',
+        nextstep:'Pull the operator\'s monthly waste report. Confirm single vs multi-state footprint. Approach EHS lead with a zero-vent pneumatic brief tied to the capture deadline.',
+        fp:'Policy news with no named operator; old dockets past hearing date.',
+        flags:['Specific compliance deadline (180d)','Pneumatic source language explicit','Regulatory hot zone','Enforcement posture'],
+        contacts:[{n:'Dana Whitfield',t:'VP, Environmental Health & Safety',e:'d.•••@northwind-op.com',li:'IN'},
+                  {n:'Marcus Reyes',t:'Regulatory Compliance Counsel',e:'m.•••@northwind-op.com',li:'IN'}],
+        confDecay:91, confInit:92}),
+      mkSignal({id:'AE-002',arch:'Permit / Project Filing',accent:'mint',tier:'gold',company:'Cascade Resources LLC',
+        sector:'Upstream oil & gas · Permian', trigger:'New permit filed', whynow:'Q3 spud window',
+        conf:88, deadline:'Q3 spud', volume:'15–25 / mo', urg:'urg-mint', urgTxt:'Act now — 60-day window',
+        titles:['VP / Director Sustainability','Director Completions'],
+        angle:'Tie the <b>new 6-well pad</b> to zero-vent pneumatics ahead of the 98% capture rule. Reference the asset by name.',
+        summary:'New compulsory pooling filing for a 6-well horizontal program in an active Permian county. Operator re-confirmed active with a fresh program after a prior 12-well filing earlier in the year.',
+        intel:'Named, dated asset filing. Scale (6 wells) and location are specific enough to anchor outreach. Confidence reset on re-detection in the latest docket.',
+        nextstep:'Pull the case files. Approach the sustainability lead with a Lea-County zero-vent brief tied to the capture deadline. Cross-reference permits in adjacent states to size the account.',
+        fp:'Deadline-extension cases with no new pad; permits already drilled.',
+        flags:['Basin distribution footprint','Regulatory hot zone','Project asset scale (6 wells)','Compliance deadline (180d)'],
+        contacts:[{n:'Priya Anand',t:'Director, Sustainability',e:'p.•••@cascaderes.com',li:'IN'},
+                  {n:'Tom Becker',t:'Director, Completions',e:'t.•••@cascaderes.com',li:'IN'}],
+        confDecay:88, confInit:88}),
+      mkSignal({id:'AE-003',arch:'Decarbonization Commitment',accent:'cyan',tier:'silver',company:'Meridian Foods Group',
+        sector:'Food & beverage manufacturing', trigger:'Net-zero pledge', whynow:'FY26 capex cycle',
+        conf:74, deadline:'2030 target', volume:'20–30 / mo', urg:'urg-cyan', urgTxt:'Act this month — context window',
+        titles:['Head of ESG / Sustainability','CFO'],
+        angle:'Anchor on the gap between the <b>public 2030 pledge</b> and the absence of a funded roadmap. Lead with the FY26 capex window.',
+        summary:'Published a 2030 net-zero commitment in its latest sustainability report without a disclosed funded roadmap or interim milestones — a classic commitment-without-mechanism gap.',
+        intel:'Public, dated commitment with reputational exposure. No interim plan disclosed, which is the wedge. Mid-cap, listed — budget pathway plausible.',
+        nextstep:'Map the public pledge to your offering\'s measurable contribution. Reach the ESG lead before the FY26 capex cycle closes.',
+        fp:'Generic ESG boilerplate with no target year; pledges already backed by a funded plan.',
+        flags:['Public commitment with deadline','Listed company','Sustainability report just published'],
+        contacts:[{n:'Sofia Lindqvist',t:'Head of ESG & Sustainability',e:'s.•••@meridianfoods.com',li:'IN'}],
+        confDecay:74, confInit:80}),
+      mkSignal({id:'AE-004',arch:'Initiative-Linked Hire',accent:'grey',tier:'silver',company:'Stratus Logistics',
+        sector:'Freight & fleet logistics', trigger:'New VP hire', whynow:'First-90-days mandate',
+        conf:68, deadline:'90-day ramp', volume:'10–18 / mo', urg:'urg-cyan', urgTxt:'Act this month — context window',
+        titles:['New VP Sustainability','COO'],
+        angle:'Reach the <b>new hire in their first 90 days</b> while mandate and budget are still being set. New senior hire is a buying signal, not a disqualifier.',
+        summary:'Hired a new VP of Sustainability tied to a publicly announced fleet electrification initiative. New mandate, fresh budget authority, no incumbent vendor relationships.',
+        intel:'Initiative-specific hire (not a backfill). 90-day window where vendor decisions get framed. Title maps cleanly to your buyer.',
+        nextstep:'Reach the new VP within their first quarter. Offer a fleet-electrification readiness brief framed around their stated mandate.',
+        fp:'Agency / recruiter job posts (not operator roles); backfills with no new initiative.',
+        flags:['Named decision-maker','Initiative-linked','Fresh mandate window'],
+        contacts:[{n:'Elena Voss',t:'VP, Sustainability (joined Apr 2026)',e:'e.•••@stratuslog.com',li:'IN'}],
+        confDecay:68, confInit:72}),
+      mkSignal({id:'AE-005',arch:'Capacity / Infrastructure RFP',accent:'lime',tier:'gold',company:'Harbor Grid Company',
+        sector:'Electric utility · T&D', trigger:'Open RFP', whynow:'RFP closes Aug 15',
+        conf:85, deadline:'Aug 15 close', volume:'5–9 / mo', urg:'urg-now', urgTxt:'Act this quarter',
+        titles:['Director Grid Modernization','Procurement Lead'],
+        angle:'Map your solution to the <b>named RFP line items</b> before the Aug 15 close. Get on the bidder list now.',
+        summary:'Issued an open RFP for grid-modernization and capacity work with a fixed August close date and named technical line items.',
+        intel:'Dated, open procurement with named scope. Highest-intent signal type — an active buying process, not a leading indicator.',
+        nextstep:'Confirm bidder eligibility. Map capabilities to the RFP\'s named line items. Engage the procurement lead before close.',
+        fp:'Press releases announcing intent with no procurement action; RFPs already closed.',
+        flags:['Open dated RFP','Named technical scope','Procurement action confirmed','Budget implied'],
+        contacts:[{n:'Raymond Cho',t:'Director, Grid Modernization',e:'r.•••@harborgrid.com',li:'IN'},
+                  {n:'Aisha Bello',t:'Senior Procurement Lead',e:'a.•••@harborgrid.com',li:'IN'}],
+        confDecay:85, confInit:86}),
+      mkSignal({id:'AE-006',arch:'Permit / Project Filing',accent:'mint',tier:'gold',company:'Talon Midstream Partners',
+        sector:'Midstream · gathering & processing', trigger:'New permit filed', whynow:'New compressor station',
+        conf:83, deadline:'Q4 build', volume:'15–25 / mo', urg:'urg-mint', urgTxt:'Act now — 60-day window',
+        titles:['VP Operations','Director Environmental'],
+        angle:'New compressor station filing — lead with emissions-control retrofit ahead of commissioning.',
+        summary:'Air permit filing for a new compressor station, indicating fresh midstream build with emissions-control scope.',
+        intel:'Dated infrastructure filing with named asset and emissions scope.',
+        nextstep:'Pull the air permit. Approach operations with a compressor-station emissions brief.',
+        fp:'Renewals of existing permits; filings with no new asset.',
+        flags:['Named asset','Emissions scope','Infrastructure build'],
+        contacts:[{n:'Grant Mueller',t:'VP, Operations',e:'g.•••@talonmid.com',li:'IN'}],
+        confDecay:83, confInit:84}),
+      mkSignal({id:'AE-007',arch:'Decarbonization Commitment',accent:'cyan',tier:'silver',company:'Cobalt Mobility',
+        sector:'EV & e-mobility', trigger:'Net-zero pledge', whynow:'Decaying — re-confirm',
+        conf:42, deadline:'2035 target', volume:'20–30 / mo', urg:'urg-plan', urgTxt:'Monitor', status:'stale',
+        titles:['Head of Sustainability','VP Operations'],
+        angle:'Older pledge, decaying confidence. Re-confirm an active driver before investing outreach effort.',
+        summary:'Earlier net-zero pledge that has not resurfaced in recent scans. Confidence has decayed below the active threshold.',
+        intel:'Seeded earlier; not re-confirmed in the latest scans. Kept in the registry, flagged stale.',
+        nextstep:'Re-confirm with a fresh trigger before prioritizing. Do not lead outreach on a decayed signal.',
+        fp:'Old commitments with no recent activity.',
+        flags:['Aging signal','Re-confirmation needed'],
+        contacts:[{n:'Lena Park',t:'Head of Sustainability',e:'l.•••@cobaltmob.com',li:'IN'}],
+        confDecay:42, confInit:78}),
+      mkSignal({id:'AE-008',arch:'Regulatory Enforcement',accent:'lime',tier:'gold',company:'Verde Water District',
+        sector:'Water & wastewater utility', trigger:'Enforcement notice', whynow:'PFAS consent order',
+        conf:80, deadline:'2027 compliance', volume:'8–12 / mo', urg:'urg-now', urgTxt:'Act this quarter',
+        titles:['District Engineer','Compliance Director'],
+        angle:'PFAS consent order with a fixed compliance horizon — lead with treatment-readiness.',
+        summary:'Entered a consent order for PFAS treatment with a fixed multi-year compliance horizon and named obligations.',
+        intel:'Enforcement action with named obligations and a dated horizon.',
+        nextstep:'Pull the consent order. Approach the district engineer with a PFAS treatment-readiness brief.',
+        fp:'General PFAS policy news; advisories without enforcement.',
+        flags:['Consent order','Named obligations','Compliance horizon'],
+        contacts:[{n:'Howard Tran',t:'District Engineer',e:'h.•••@verdewater.gov',li:'IN'}],
+        confDecay:80, confInit:82})
+    ]
+  },
+  acme_water:{
+    name:'Acme Water', code:'AW', accent:'cyan',
+    sub:'Municipal and industrial water operators facing enforcement and infrastructure renewal triggers.',
+    signals:[
+      mkSignal({id:'AW-001',arch:'Regulatory Enforcement',accent:'lime',tier:'gold',company:'Cedar Valley Sanitation',
+        sector:'POTW · wastewater', trigger:'Enforcement notice', whynow:'Effluent surcharge order',
+        conf:89, deadline:'180-day cure', volume:'6–10 / mo', urg:'urg-now', urgTxt:'Act this quarter',
+        titles:['Operations Director','Compliance Manager'],
+        angle:'Surcharge order with a <b>180-day cure window</b> — lead with the fastest documented remediation path.',
+        summary:'Effluent surcharge enforcement order with a fixed cure window and named violations.',
+        intel:'Dated enforcement with cure deadline and named operator.',
+        nextstep:'Pull the order. Approach operations with a remediation brief tied to the cure window.',
+        fp:'Policy news with no named operator.',
+        flags:['Cure deadline','Named operator','Enforcement posture'],
+        contacts:[{n:'Brenda Osei',t:'Operations Director',e:'b.•••@cedarvalley.gov',li:'IN'}],
+        confDecay:89, confInit:90}),
+      mkSignal({id:'AW-002',arch:'Capacity / Infrastructure RFP',accent:'mint',tier:'gold',company:'Lakeshore Water Authority',
+        sector:'Municipal water', trigger:'Open RFP', whynow:'Treatment upgrade RFP',
+        conf:86, deadline:'Sep 1 close', volume:'4–8 / mo', urg:'urg-now', urgTxt:'Act this quarter',
+        titles:['Capital Projects Director','Procurement Lead'],
+        angle:'Treatment-upgrade RFP — map to <b>named line items</b> before the Sep 1 close.',
+        summary:'Open RFP for a treatment-plant capacity upgrade with named scope and a fixed close date.',
+        intel:'Active dated procurement with named technical scope.',
+        nextstep:'Confirm eligibility, map to line items, engage procurement before close.',
+        fp:'Closed RFPs; intent announcements with no procurement.',
+        flags:['Open RFP','Named scope','Budget implied'],
+        contacts:[{n:'Victor Salas',t:'Capital Projects Director',e:'v.•••@lakeshorewa.gov',li:'IN'}],
+        confDecay:86, confInit:86}),
+      mkSignal({id:'AW-003',arch:'Decarbonization Commitment',accent:'cyan',tier:'silver',company:'Summit Beverages',
+        sector:'Beverage manufacturing', trigger:'Water-stewardship pledge', whynow:'FY26 budget',
+        conf:71, deadline:'2030 target', volume:'12–20 / mo', urg:'urg-cyan', urgTxt:'Act this month — context window',
+        titles:['Head of Sustainability','Plant Operations Manager'],
+        angle:'Public water-stewardship pledge with no disclosed roadmap — lead with the funding gap.',
+        summary:'Published a water-stewardship and reuse pledge without a disclosed funded roadmap.',
+        intel:'Public dated commitment, no interim plan disclosed.',
+        nextstep:'Map offering to the pledge; reach the sustainability lead before FY26 budget closes.',
+        fp:'ESG boilerplate with no target year.',
+        flags:['Public commitment','No funded plan'],
+        contacts:[{n:'Naomi Frost',t:'Head of Sustainability',e:'n.•••@summitbev.com',li:'IN'}],
+        confDecay:71, confInit:76}),
+      mkSignal({id:'AW-004',arch:'Initiative-Linked Hire',accent:'grey',tier:'silver',company:'Granite Industrial',
+        sector:'Industrial manufacturing', trigger:'New VP hire', whynow:'First-90-days mandate',
+        conf:66, deadline:'90-day ramp', volume:'8–14 / mo', urg:'urg-cyan', urgTxt:'Act this month — context window',
+        titles:['New Director of Water Strategy','VP Operations'],
+        angle:'New water-strategy hire — reach them in the <b>first 90 days</b> while budget is set.',
+        summary:'Hired a Director of Water Strategy tied to a publicly stated water-reduction initiative.',
+        intel:'Initiative-specific hire with fresh mandate and budget authority.',
+        nextstep:'Reach the new director within their first quarter with a readiness brief.',
+        fp:'Recruiter posts; backfills with no initiative.',
+        flags:['Named decision-maker','Initiative-linked'],
+        contacts:[{n:'Derek Yamada',t:'Director, Water Strategy (joined May 2026)',e:'d.•••@graniteind.com',li:'IN'}],
+        confDecay:66, confInit:70}),
+      mkSignal({id:'AW-005',arch:'Regulatory Enforcement',accent:'lime',tier:'gold',company:'Riverbend Utility District',
+        sector:'Water utility', trigger:'Consent order', whynow:'PFAS treatment mandate',
+        conf:82, deadline:'2027 compliance', volume:'6–10 / mo', urg:'urg-now', urgTxt:'Act this quarter',
+        titles:['District Engineer','Compliance Director'],
+        angle:'PFAS consent order — lead with treatment-readiness ahead of the compliance horizon.',
+        summary:'PFAS treatment consent order with a fixed multi-year horizon and named obligations.',
+        intel:'Enforcement action, named obligations, dated horizon.',
+        nextstep:'Pull the order; approach the district engineer with a readiness brief.',
+        fp:'General PFAS news; advisories without enforcement.',
+        flags:['Consent order','Compliance horizon'],
+        contacts:[{n:'Carla Mendes',t:'District Engineer',e:'c.•••@riverbendud.gov',li:'IN'}],
+        confDecay:82, confInit:84}),
+      mkSignal({id:'AW-006',arch:'Capacity / Infrastructure RFP',accent:'mint',tier:'gold',company:'Coastal Desalination Co.',
+        sector:'Desalination', trigger:'Open RFP', whynow:'Membrane replacement RFP',
+        conf:84, deadline:'Aug 30 close', volume:'4–8 / mo', urg:'urg-now', urgTxt:'Act this quarter',
+        titles:['Plant Director','Procurement Lead'],
+        angle:'Membrane-replacement RFP — get on the bidder list before the Aug 30 close.',
+        summary:'Open RFP for membrane replacement with named scope and fixed close date.',
+        intel:'Active dated procurement, named technical scope.',
+        nextstep:'Confirm eligibility, map to line items, engage before close.',
+        fp:'Closed RFPs; intent with no procurement.',
+        flags:['Open RFP','Named scope'],
+        contacts:[{n:'Ian Whitlock',t:'Plant Director',e:'i.•••@coastaldesal.com',li:'IN'}],
+        confDecay:84, confInit:85})
+    ]
+  }
+};
+
+/* standardized "act in X days" window + force all surfaced signals active */
+const ACT_DAYS={
+  'AE-001':90,'AE-002':45,'AE-003':28,'AE-004':21,'AE-005':68,'AE-006':50,'AE-007':30,'AE-008':84,
+  'AW-001':90,'AW-002':85,'AW-003':28,'AW-004':21,'AW-005':90,'AW-006':83
+};
+Object.values(CLIENTS).forEach(c=>c.signals.forEach(s=>{ s.days=ACT_DAYS[s.id]??30; s.status='active'; if(s.conf<50)s.conf=60; }));
+function actClass(d){ return d<=30 ? 'act-urgent' : d<=60 ? 'act-soon' : 'act-plan'; }
+
+/* ============== STATE ============== */
+let state = {client:'acme_energy', tier:'feed'};
+
+/* ============== ICONS ============== */
+const IC = {
+  lock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
+  info:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>',
+  spark:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/></svg>',
+  pen:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
+  slack:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/></svg>'
+};
+
+/* ============== RENDER ============== */
+function accentVar(a){return ACCENTS[a]||ACCENTS.lime;}
+
+function buildClientMenu(){
+  const m=document.getElementById('csMenu');
+  m.innerHTML=Object.entries(CLIENTS).map(([k,c])=>
+    `<button class="cs-item" data-client="${k}"><span class="ci-dot" style="background:${accentVar(c.accent)};box-shadow:0 0 8px ${accentVar(c.accent)}"></span>${c.name}<span class="ci-tier">${c.signals.length} signals</span></button>`).join('');
+  m.querySelectorAll('.cs-item').forEach(b=>b.onclick=()=>{state.client=b.dataset.client;document.getElementById('csMenu').classList.remove('open');render();});
+}
+
+function render(){
+  const c=CLIENTS[state.client], t=TIERS[state.tier];
+  document.documentElement.style.setProperty('--accent',accentVar(c.accent));
+  document.getElementById('csName').textContent=c.name;
+  document.querySelector('.avatar').textContent=c.code;
+  document.getElementById('tierLabel').textContent=t.label;
+  document.getElementById('phSub').textContent=c.sub;
+  document.querySelectorAll('#tierSeg button').forEach(b=>b.classList.toggle('on',b.dataset.tier===state.tier));
+
+  const active=c.signals.filter(s=>s.status==='active');
+  const avg=Math.round(c.signals.reduce((a,s)=>a+s.conf,0)/c.signals.length);
+  document.getElementById('statStrip').innerHTML=
+    `<div class="ss"><span class="ss-val">${c.signals.length}</span><span class="ss-lbl">Signals</span></div>
+     <div class="ss"><span class="ss-val accent" style="color:var(--accent)">${active.length}</span><span class="ss-lbl">Active</span></div>
+     <div class="ss"><span class="ss-val"><em class="serif">${avg}</em></span><span class="ss-lbl">Avg conf</span></div>`;
+
+  const cap = t.cap;
+  const visible = c.signals.slice(0,cap), locked = c.signals.slice(cap);
+  document.getElementById('feedMetaTxt').textContent =
+    state.tier==='feed' ? `Surfaced this period · ${Math.min(cap,c.signals.length)} of ${c.signals.length}` : `All signals · ${c.signals.length}`;
+
+  let html = visible.map(s=>cardHTML(s,t)).join('');
+  html += locked.map(s=>lockedCardHTML(s)).join('');
+  document.getElementById('cards').innerHTML=html;
+
+  // upsell banner
+  document.getElementById('upsellSlot').innerHTML = upsellHTML(state.tier, locked.length, c.signals.length);
+
+  bindCards();
+}
+
+function cardHTML(s,t){
+  const ac=accentVar(s.accent);
+  const dmTitles = s.titles.map(x=>`<span class="dm-pill">${x}</span>`).join('');
+  // decision-maker block: titles+angle on all tiers; enriched contacts only when tier.enrich
+  const dmBlock = `<div class="dm">
+      <div class="dm-hdr">Decision-makers to reach${t.enrich?' · enriched':''}</div>
+      ${ t.enrich
+        ? s.contacts.map(p=>`<div class="contact"><span class="c-av">${p.n.split(' ').map(w=>w[0]).join('')}</span>
+            <div><div class="c-name">${p.n}</div><div class="c-title">${p.t}</div></div>
+            <div class="c-meta"><span class="c-tag">${p.e}</span><a class="c-li" href="#" onclick="return false">${p.li}↗</a></div></div>`).join('')
+        : `<div class="dm-titles">${dmTitles}</div>` }
+      <div class="dm-angle">${s.angle}</div>
+    </div>`;
+
+  // action buttons
+  const enrichBtn = t.enrich
+    ? `<button class="btn btn-ghost" data-act="enrich" data-id="${s.id}">${IC.spark}Find &amp; enrich</button>`
+    : `<span class="lock-tip"><button class="btn btn-lock" disabled>${IC.lock}Find &amp; enrich</button><span class="tip">Signal Stack →</span></span>`;
+  const outreachBtn = t.outreach
+    ? `<button class="btn btn-ghost" data-act="outreach" data-id="${s.id}">${IC.pen}Generate outreach</button>`
+    : `<span class="lock-tip"><button class="btn btn-lock" disabled>${IC.lock}Generate outreach</button><span class="tip">Signal Stack →</span></span>`;
+  const slackBtn = t.slack
+    ? `<button class="btn btn-ghost" data-act="slack" data-id="${s.id}">${IC.slack}Push to Slack</button>` : '';
+
+  return `<div class="card" data-id="${s.id}">
+    <div class="card-flex">
+      <div class="arch-rail" style="--ac:${ac}">
+        <div class="rail-arch">${s.arch}</div>
+        <div class="rail-strength">
+          <div class="rs-lbl">Signal strength</div>
+          <div class="rs-val">${s.conf}<span>/100</span></div>
+          <div class="strength-bar"><i style="width:${s.conf}%;background:${ac}"></i></div>
+        </div>
+      </div>
+      <div class="card-main">
+        <div class="card-top">
+          <div class="ct-left">
+            <div class="co-name">${s.company}</div>
+            <div class="co-tag">${s.sector}</div>
+            <div class="trigger-row">
+              <span class="trigger-chip">${s.trigger}</span>
+              <span class="whynow"><b>WHY NOW</b> · ${s.whynow}</span>
+            </div>
+          </div>
+          <div class="ct-stats">
+            <div class="chip"><span class="chip-val">${s.deadline}</span><span class="chip-lbl">Deadline</span></div>
+            <div class="chip"><span class="chip-val" style="font-size:13px">${s.volume}</span><span class="chip-lbl">30-day vol</span></div>
+          </div>
+        </div>
+        <div class="card-mid">
+          <span class="act-pill ${actClass(s.days)}">Act in ${s.days} days</span>
+          ${dmBlock}
+        </div>
+        <div class="card-actions">
+          <button class="btn btn-accent" data-act="detail" data-id="${s.id}">${IC.info}View signal detail</button>
+          ${enrichBtn}${outreachBtn}${slackBtn}
+          <a class="src-link" href="#" onclick="return false">verified ↗</a>
+        </div>
+        <div class="fp-flag"><span class="fp-lbl">Filtered out</span><span>${s.fp}</span></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function lockedCardHTML(s){
+  return `<div class="card locked">
+    <div class="card-flex">
+      <div class="arch-rail" style="--ac:rgba(255,255,255,.18)"><div class="rail-arch" style="color:rgba(255,255,255,.5)">${s.arch}</div></div>
+      <div class="card-main">
+        <div class="card-top"><div class="ct-left">
+          <div class="co-name">${s.company}</div><div class="co-tag">${s.sector}</div>
+        </div></div>
+        <div class="card-mid"><span class="act-pill ${actClass(s.days)}">Act in ${s.days} days</span></div>
+      </div>
+    </div>
+    <div class="lock-overlay">
+      <span class="lk-ic">${IC.lock}</span>
+      <div class="lk-t">1 more qualified signal this period</div>
+      <div class="lk-s">Signal Feed surfaces up to 5 archetypes per month. Unlock unlimited confirmed signals with Signal Stack.</div>
+      <button class="btn btn-accent" data-act="upgrade" data-to="stack">Upgrade to Signal Stack →</button>
+    </div>
+  </div>`;
+}
+
+function upsellHTML(tier,lockedCount,total){
+  if(tier==='command') return `<div class="upsell"><div class="us-l">
+      <div class="us-t">You're on <em>Signal Command</em> — everything is unlocked</div>
+      <div class="us-s">Unlimited signals across up to 4 segments, enriched contacts, generated outreach, plus Slack push and dedicated channel.</div>
+      <div class="us-feats"><span class="us-feat">Up to 4 segments</span><span class="us-feat">Slack push</span><span class="us-feat">CRM enrichment</span><span class="us-feat">Custom sources</span><span class="us-feat">Bi-weekly review</span></div>
+    </div></div>`;
+  if(tier==='stack') return `<div class="upsell"><div class="us-l">
+      <div class="us-t">Unlock <em>Signal Command</em></div>
+      <div class="us-s">Push qualified signals straight to a dedicated Slack channel the moment they clear threshold, add up to 4 segments, and bring your own custom sources.</div>
+      <div class="us-feats"><span class="us-feat">Enriched contacts ✓</span><span class="us-feat">Generated outreach ✓</span><span class="us-feat locked">Slack push</span><span class="us-feat locked">Up to 4 segments</span><span class="us-feat locked">Custom sources</span></div>
+    </div>
+    <div style="margin-left:auto"><button class="btn btn-accent" data-act="upgrade" data-to="command">See Signal Command →</button></div></div>`;
+  return `<div class="upsell"><div class="us-l">
+      <div class="us-t">Unlock <em>Signal Stack</em> — ${lockedCount} more signal${lockedCount!==1?'s':''} waiting</div>
+      <div class="us-s">Signal Feed gives you 5 archetypes a month with target titles and the angle. Signal Stack unlocks every confirmed signal, finds and enriches the named decision-makers, and generates trigger-specific outreach in one click.</div>
+      <div class="us-feats"><span class="us-feat">Target titles + angle ✓</span><span class="us-feat locked">Unlimited signals</span><span class="us-feat locked">Find &amp; enrich contacts</span><span class="us-feat locked">Generate outreach</span><span class="us-feat locked">CRM enrichment</span></div>
+    </div>
+    <div style="margin-left:auto"><button class="btn btn-accent" data-act="upgrade" data-to="stack">Upgrade to Signal Stack →</button></div></div>`;
+}
+
+/* ============== INTERACTIONS ============== */
+function findSig(id){return CLIENTS[state.client].signals.find(s=>s.id===id);}
+
+function bindCards(){
+  document.querySelectorAll('[data-act]').forEach(el=>{
+    el.onclick=()=>{
+      const act=el.dataset.act, id=el.dataset.id;
+      if(act==='upgrade'){state.tier=el.dataset.to;render();window.scrollTo({top:0,behavior:'smooth'});return;}
+      const s=findSig(id); if(!s)return;
+      if(act==='detail')openSheet(s);
+      else if(act==='enrich')enrich(s);
+      else if(act==='outreach')openOutreach(s);
+      else if(act==='slack')toast(`Pushed "${s.company}" to #acme-signals on Slack`);
+    };
+  });
+}
+
+function enrich(s){ openSheet(s,'contacts'); }
+
+function openSheet(s,focus){
+  const ac=accentVar(s.accent);
+  document.getElementById('sheetStripe').style.background=ac;
+  document.getElementById('sheetHead').innerHTML=
+    `<div class="badges" style="margin-bottom:10px">
+       <span class="b-arch" style="background:${ac}1a;color:${ac};border:1px solid ${ac}3a">${s.arch}</span>
+       <span class="act-pill ${actClass(s.days)}">Act in ${s.days} days</span></div>
+     <div class="co-name" style="font-size:24px">${s.company}</div>
+     <div class="co-tag">${s.sector}</div>
+     <div style="margin-top:15px;max-width:260px">
+       <div class="rs-lbl">Signal strength</div>
+       <div class="rs-val" style="margin-top:3px">${s.conf}<span>/100</span></div>
+       <div class="strength-bar" style="margin-top:7px"><i style="width:${s.conf}%;background:${ac}"></i></div>
+     </div>`;
+
+  const t=TIERS[state.tier];
+  const contactSec = t.enrich
+    ? `<div class="sec"><div class="sec-hdr"><span class="num">5</span> Enriched decision-makers</div>
+        ${s.contacts.map(p=>`<div class="contact"><span class="c-av">${p.n.split(' ').map(w=>w[0]).join('')}</span>
+          <div><div class="c-name">${p.n}</div><div class="c-title">${p.t}</div></div>
+          <div class="c-meta"><span class="c-tag">${p.e}</span><a class="c-li" href="#" onclick="return false">${p.li}↗</a></div></div>`).join('')}
+        <div style="margin-top:12px"><button class="btn btn-accent" data-act="outreach" data-id="${s.id}">${IC.pen}Generate outreach</button></div></div>`
+    : `<div class="sec"><div class="sec-hdr"><span class="num">5</span> Decision-makers to reach</div>
+        <div class="dm-titles">${s.titles.map(x=>`<span class="dm-pill">${x}</span>`).join('')}</div>
+        <div class="dm-angle" style="margin-top:9px">${s.angle}</div>
+        <div style="margin-top:12px"><span class="lock-tip"><button class="btn btn-lock" disabled>${IC.lock}Find &amp; enrich named contacts</button></span>
+        <span style="font-size:11px;color:var(--txt-3);margin-left:8px">Available on Signal Stack</span></div></div>`;
+
+  document.getElementById('sheetBody').innerHTML=
+    `<div class="sec"><div class="sec-hdr"><span class="num">1</span> Signal intelligence</div><div class="sec-body muted">${s.intel}</div></div>
+     <div class="sec"><div class="sec-hdr"><span class="num">2</span> Summary</div><div class="sec-body muted">${s.summary}</div></div>
+     <div class="sec"><div class="sec-hdr"><span class="num">3</span> Why now</div><div class="sec-body">${s.whynow} — act within ${s.days} days.</div></div>
+     <div class="sec"><div class="sec-hdr"><span class="num">4</span> Suggested next step</div><div class="sec-body muted">${s.nextstep}</div></div>
+     ${contactSec}
+     <div class="sec"><div class="sec-hdr"><span class="num">6</span> Signal facts</div>
+        <dl class="kv">
+          <dt>Signal ID</dt><dd>${s.id}</dd>
+          <dt>Trigger</dt><dd>${s.trigger}</dd>
+          <dt>Signal strength</dt><dd>${s.conf} / 100</dd>
+          <dt>Act within</dt><dd>${s.days} days</dd>
+          <dt>Deadline</dt><dd>${s.deadline}</dd>
+          <dt>Est. volume</dt><dd>${s.volume}</dd>
+        </dl>
+        <div class="decaybar"><i style="width:${s.conf}%;background:${ac}"></i></div></div>
+     <div class="sec"><div class="sec-hdr"><span class="num">7</span> Rank-boost flags</div><div class="flags">${s.flags.map(f=>`<span class="flag">${f}</span>`).join('')}</div></div>
+     <div class="sec" style="border-bottom:none"><div class="sec-hdr"><span class="num">8</span> False-positive filter</div><div class="sec-body" style="color:var(--txt-2)"><span style="color:var(--red);font-weight:700;font-size:10px;letter-spacing:.08em;text-transform:uppercase">Suppressed → </span>${s.fp}</div></div>`;
+
+  document.getElementById('scrim').classList.add('open');
+  document.getElementById('sheet').classList.add('open');
+  // rebind buttons inside sheet
+  document.querySelectorAll('#sheetBody [data-act]').forEach(el=>el.onclick=()=>{const s2=findSig(el.dataset.id);if(el.dataset.act==='outreach')openOutreach(s2);});
+  if(focus==='contacts'){document.getElementById('sheetBody').scrollIntoView();}
+}
+function closeSheet(){document.getElementById('scrim').classList.remove('open');document.getElementById('sheet').classList.remove('open');}
+
+function openOutreach(s){
+  const p=s.contacts[0];
+  const ac=accentVar(s.accent);
+  const script=`Subject: ${s.whynow} — quick thought for ${s.company}\n\nHi ${p?p.n.split(' ')[0]:'there'},\n\nSaw ${s.company}'s ${s.trigger.toLowerCase()} (${s.arch.toLowerCase()}). With ${s.deadline} on the clock, most teams in your position are weighing how to get to documented compliance fast without pulling ops off-cycle.\n\nWe've helped comparable operators turn exactly this trigger into a defensible plan in weeks, not quarters. Worth a 20-minute look at how it maps to your situation?\n\nBest,\n[Your name]`;
+  document.getElementById('sheetStripe').style.background=ac;
+  document.getElementById('sheetHead').innerHTML=`<div class="eyebrow" style="color:${ac}">Generated outreach · ${s.id}</div><div class="co-name" style="font-size:22px;margin-top:6px">${s.company}</div><div class="co-tag">Drafted on the ${s.arch.toLowerCase()} trigger${p?' · to '+p.n:''}</div>`;
+  document.getElementById('sheetBody').innerHTML=
+    `<div class="sec"><div class="sec-hdr"><span class="num">→</span> Angle</div><div class="sec-body">${s.angle}</div></div>
+     <div class="sec"><div class="sec-hdr"><span class="num">✎</span> Draft email</div>
+       <pre style="white-space:pre-wrap;font-family:'DM Sans',sans-serif;font-size:13px;line-height:1.6;color:var(--txt);background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:10px;padding:16px">${script}</pre>
+       <div style="margin-top:12px;display:flex;gap:9px"><button class="btn btn-accent" onclick="toast('Copied to clipboard')">Copy</button><button class="btn btn-ghost" onclick="toast('Pushed to CRM as a task')">Push to CRM</button></div></div>
+     <div class="sec" style="border-bottom:none"><div class="sec-body" style="color:var(--txt-3);font-size:11.5px">Demo draft. In production this is generated per-signal from the trigger, the account context, and your messaging guardrails (Stage 10).</div></div>`;
+  document.getElementById('scrim').classList.add('open');
+  document.getElementById('sheet').classList.add('open');
+}
+
+function toast(msg){
+  let el=document.createElement('div');el.textContent=msg;
+  el.style.cssText='position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:var(--accent);color:#000;font-weight:700;font-size:13px;padding:11px 20px;border-radius:99px;z-index:120;box-shadow:0 14px 40px rgba(0,0,0,.5)';
+  document.body.appendChild(el);setTimeout(()=>el.remove(),1900);
+}
+
+/* ============== INIT ============== */
+document.getElementById('csBtn').onclick=()=>document.getElementById('csMenu').classList.toggle('open');
+document.querySelectorAll('#tierSeg button').forEach(b=>b.onclick=()=>{state.tier=b.dataset.tier;render();});
+document.getElementById('shClose').onclick=closeSheet;
+document.getElementById('scrim').onclick=closeSheet;
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSheet();});
+document.addEventListener('click',e=>{if(!e.target.closest('.client-switch'))document.getElementById('csMenu').classList.remove('open');});
+buildClientMenu();
+render();
+</script>
+</body>
+</html>
