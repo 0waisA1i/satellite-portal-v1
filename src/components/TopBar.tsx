@@ -1,10 +1,5 @@
 import type { Client, Tier } from "@/lib/types";
-
-const TIER_LABELS: Record<Tier, string> = {
-  feed: "Signal Feed",
-  stack: "Signal Stack",
-  command: "Signal Command",
-};
+import { PLAN_LABELS } from "@/lib/feed";
 
 function Logo() {
   return (
@@ -46,10 +41,13 @@ export default function TopBar({ client, tier }: { client: Client; tier: Tier })
           {client.name}
         </div>
       </div>
-      <div className="flex items-center gap-[14px]">
+      <div className="flex items-center gap-[12px]">
         <span className="inline-flex items-center gap-[7px] rounded-full border border-accent/25 bg-accent/10 px-[13px] py-[6px] text-[11px] font-bold uppercase tracking-[0.06em] text-accent">
           <span className="h-[6px] w-[6px] rounded-full bg-accent shadow-[0_0_8px_var(--accent)]" />
-          {TIER_LABELS[tier]}
+          Signal Satellite
+        </span>
+        <span className="rounded-full border border-line bg-panel px-[10px] py-[5px] text-[9.5px] font-semibold uppercase tracking-[0.08em] text-txt-3">
+          {PLAN_LABELS[tier]} plan
         </span>
         <div className="flex h-[32px] w-[32px] items-center justify-center rounded-full border border-line-2 bg-gradient-to-br from-[#2a2a2a] to-[#111] text-[12px] font-bold text-txt-2">
           {client.code}

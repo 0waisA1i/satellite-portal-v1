@@ -3,23 +3,48 @@ import { archetypeAccent, formatDeadline } from "@/lib/archetypes";
 import ActPill from "./ActPill";
 import ArchetypeRail from "./ArchetypeRail";
 import ContactRow from "./ContactRow";
-import { InfoIcon, LockIcon, PenIcon, SlackIcon, SparkIcon } from "./icons";
+import { CrmIcon, InfoIcon, LockIcon, PenIcon, SparkIcon } from "./icons";
 
 const btn =
   "inline-flex items-center gap-[7px] rounded-[9px] px-[15px] py-[9px] text-[12px] font-semibold transition";
 export const btnGhost = `${btn} border border-line-2 bg-panel hover:border-white/30 hover:bg-panel-2`;
 export const btnAccent = `${btn} bg-accent text-black hover:brightness-110`;
-const btnLock = `${btn} cursor-not-allowed border border-dashed border-line-2 bg-white/[0.025] text-txt-4`;
 
-function LockedAction({ label }: { label: string }) {
+// One button shape for every feature. Unlocked = a normal ghost button.
+// Locked = the same button, dimmed, with a small lock and a tooltip naming
+// the plan that unlocks it. Subtle, never hidden.
+function FeatureButton({
+  icon,
+  label,
+  unlocked,
+  unlockLabel,
+  onClick,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  unlocked: boolean;
+  unlockLabel: string;
+  onClick: () => void;
+}) {
+  if (unlocked) {
+    return (
+      <button className={btnGhost} onClick={onClick}>
+        {icon}
+        {label}
+      </button>
+    );
+  }
   return (
     <span className="group relative">
-      <button className={btnLock} disabled>
-        <LockIcon className="h-[14px] w-[14px] opacity-60" />
+      <button
+        className={`${btn} cursor-not-allowed border border-line bg-white/[0.02] text-txt-4`}
+        disabled
+      >
+        <LockIcon className="h-[13px] w-[13px] opacity-70" />
         {label}
       </button>
       <span className="pointer-events-none absolute bottom-[calc(100%+8px)] left-1/2 -translate-x-1/2 whitespace-nowrap rounded-[8px] border border-line-2 bg-[#0b0b0b] px-[11px] py-[7px] text-[10px] font-semibold tracking-[0.02em] text-accent opacity-0 shadow-[0_12px_30px_rgba(0,0,0,.7)] transition group-hover:opacity-100">
-        Signal Stack →
+        {unlockLabel} →
       </span>
     </span>
   );
@@ -31,17 +56,17 @@ export default function SignalCard({
   onDetail,
   onEnrich,
   onOutreach,
-  onSlack,
+  onCrm,
 }: {
   signal: VisibleSignal;
   subscription: Subscription;
   onDetail: () => void;
   onEnrich: () => void;
   onOutreach: () => void;
-  onSlack: () => void;
+  onCrm: () => void;
 }) {
   const accent = archetypeAccent(signal.archetype);
-  const enriched = subscription.enrich_enabled && signal.contacts;
+  const anyEnriched = subscription.enrich_enabled;
 
   return (
     <div className="relative overflow-hidden rounded-[14px] border border-line bg-panel transition hover:border-line-2 hover:bg-white/5">
@@ -99,10 +124,12 @@ export default function SignalCard({
             <ActPill days={signal.act_within_days} />
             <div className="min-w-0 flex-1">
               <div className="mb-[4px] text-[8px] font-bold uppercase tracking-[0.13em] text-txt-3">
-                Decision-makers to reach{enriched ? " · enriched" : ""}
+                Decision-makers to reach{anyEnriched ? " · enriched" : ""}
               </div>
-              {enriched ? (
-                signal.contacts!.map((c) => <ContactRow key={c.name} contact={c} />)
+              {signal.contacts.length > 0 ? (
+                signal.contacts.map((c, i) => (
+                  <ContactRow key={`${c.title}-${i}`} contact={c} />
+                ))
               ) : (
                 <div className="flex flex-wrap items-center gap-[7px]">
                   {signal.target_titles.map((t) => (
@@ -121,34 +148,33 @@ export default function SignalCard({
             </div>
           </div>
 
-          {/* actions */}
+          {/* actions: all present, locked ones dimmed per plan */}
           <div className="mt-[15px] flex flex-wrap items-center gap-[9px] border-t border-line pt-[14px]">
             <button className={btnAccent} onClick={onDetail}>
               <InfoIcon />
               View signal detail
             </button>
-            {subscription.enrich_enabled ? (
-              <button className={btnGhost} onClick={onEnrich}>
-                <SparkIcon />
-                Find &amp; enrich
-              </button>
-            ) : (
-              <LockedAction label="Find & enrich" />
-            )}
-            {subscription.outreach_enabled ? (
-              <button className={btnGhost} onClick={onOutreach}>
-                <PenIcon />
-                Generate outreach
-              </button>
-            ) : (
-              <LockedAction label="Generate outreach" />
-            )}
-            {subscription.slack_enabled && (
-              <button className={btnGhost} onClick={onSlack}>
-                <SlackIcon />
-                Push to Slack
-              </button>
-            )}
+            <FeatureButton
+              icon={<SparkIcon />}
+              label="Find & enrich"
+              unlocked={subscription.enrich_enabled}
+              unlockLabel="Signal Stack"
+              onClick={onEnrich}
+            />
+            <FeatureButton
+              icon={<PenIcon />}
+              label="Generate outreach"
+              unlocked={subscription.outreach_enabled}
+              unlockLabel="Signal Stack"
+              onClick={onOutreach}
+            />
+            <FeatureButton
+              icon={<CrmIcon />}
+              label="Push to CRM"
+              unlocked={subscription.crm_enabled}
+              unlockLabel="Signal Command"
+              onClick={onCrm}
+            />
             {signal.source_verified && (
               <a
                 className="ml-auto whitespace-nowrap text-[9px] tracking-[0.03em] text-accent before:font-bold before:tracking-[0.1em] before:text-txt-4 before:content-['SOURCE_→_']"

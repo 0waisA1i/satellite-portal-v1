@@ -32,8 +32,10 @@ export const PenIcon = () => (
   </svg>
 );
 
-export const SlackIcon = () => (
+export const CrmIcon = () => (
   <svg {...base}>
-    <rect x="3" y="3" width="18" height="18" rx="3" />
+    <ellipse cx="12" cy="5" rx="9" ry="3" />
+    <path d="M3 5v14a9 3 0 0 0 18 0V5" />
+    <path d="M3 12a9 3 0 0 0 18 0" />
   </svg>
 );

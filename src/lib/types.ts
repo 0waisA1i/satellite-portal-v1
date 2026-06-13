@@ -10,13 +10,14 @@ export interface Client {
   accent: AccentName;
 }
 
+// One unified "Signal Satellite" view for every plan. The plan gates which
+// FEATURES are unlocked, not which signals are visible.
 export interface Subscription {
   tier: Tier;
   segment_limit: number;
-  signal_cap: number | null; // null = unlimited
-  enrich_enabled: boolean;
-  outreach_enabled: boolean;
-  slack_enabled: boolean;
+  enrich_enabled: boolean; // can reveal named contacts
+  outreach_enabled: boolean; // can generate outreach
+  crm_enabled: boolean; // can push to CRM
   current_period: string; // '2026-06'
 }
 
@@ -25,6 +26,7 @@ export interface Contact {
   title: string;
   email: string;
   linkedin_url: string;
+  enriched?: boolean; // set true once enrichment has run (later version)
 }
 
 export interface Account {
@@ -61,10 +63,19 @@ export interface Signal {
 
 export type AccentName = "lime" | "mint" | "cyan" | "grey";
 
-// What the server sends to the browser: contacts are stripped unless the
-// subscription has enrich_enabled. Locked signals never appear here at all.
+// What the server sends to the browser for one decision-maker. The title is
+// always safe to show; name/email/linkedin are null until the contact is
+// enriched (and the plan allows it), so PII never ships ungated.
+export interface VisibleContact {
+  title: string;
+  enriched: boolean;
+  name: string | null;
+  email: string | null;
+  linkedin_url: string | null;
+}
+
 export type VisibleSignal = Omit<Signal, "contacts"> & {
-  contacts: Contact[] | null;
+  contacts: VisibleContact[];
 };
 
 export interface FeedStats {
@@ -77,6 +88,5 @@ export interface GatedFeed {
   client: Client;
   subscription: Subscription;
   signals: VisibleSignal[];
-  lockedCount: number;
   stats: FeedStats;
 }

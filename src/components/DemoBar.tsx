@@ -1,37 +1,38 @@
 import Link from "next/link";
 import type { Tier } from "@/lib/types";
 
-const TIERS: { tier: Tier; label: string }[] = [
-  { tier: "feed", label: "Signal Feed" },
-  { tier: "stack", label: "Signal Stack" },
-  { tier: "command", label: "Signal Command" },
+const PLANS: { tier: Tier; label: string }[] = [
+  { tier: "feed", label: "Feed" },
+  { tier: "stack", label: "Stack" },
+  { tier: "command", label: "Command" },
 ];
 
-// Demo-only control while we run on sample data: the tier flows through the
-// URL into the server-side gate, so each toggle re-renders with re-gated data
-// (nothing is unlocked in the browser). Replaced by the real subscription row
+// Demo-only control while we run on sample data. One view (Signal Satellite)
+// is shown for every plan; this toggle previews which feature actions each
+// plan unlocks. The plan flows through the URL into the server-side gate, so
+// nothing is unlocked in the browser. Replaced by the real subscription row
 // once Supabase auth is wired.
 export default function DemoBar({ tier }: { tier: Tier }) {
   return (
     <div className="flex flex-wrap items-center justify-center gap-[14px] border-b border-line bg-lime/[0.04] px-[26px] py-[10px]">
       <span className="text-[9.5px] font-bold uppercase tracking-[0.16em] text-txt-3">
-        Preview tier
+        Preview plan
       </span>
       <div className="flex gap-[2px] rounded-[10px] border border-line bg-panel p-[3px]">
-        {TIERS.map((t) => (
+        {PLANS.map((p) => (
           <Link
-            key={t.tier}
-            href={`/?tier=${t.tier}`}
+            key={p.tier}
+            href={`/?tier=${p.tier}`}
             className={`rounded-[7px] px-[16px] py-[6px] text-[12px] font-semibold transition ${
-              t.tier === tier ? "bg-accent text-black" : "text-txt-3"
+              p.tier === tier ? "bg-accent text-black" : "text-txt-3"
             }`}
           >
-            {t.label}
+            {p.label}
           </Link>
         ))}
       </div>
       <span className="text-[11px] text-txt-4">
-        Demo control: toggle to see what each subscription tier unlocks
+        Demo control: toggle to see which features each plan unlocks
       </span>
     </div>
   );
