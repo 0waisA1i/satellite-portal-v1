@@ -8,15 +8,35 @@ export const ACCENT_HEX: Record<AccentName, string> = {
 };
 
 // Each archetype gets a distinct accent (CLAUDE.md): Gold-tier archetypes get
-// lime/mint, Silver channel cyan, Silver monitoring grey. The live DB carries
-// archetype_tier; until then this map covers the known archetypes.
+// lime/mint, Silver channel cyan, Silver monitoring grey. Keyed by the human
+// label we display on the rail (the live DB stores coded archetypes like "A1";
+// see CODE_TO_ARCHETYPE below, which resolves codes to these labels).
 const ARCHETYPE_STYLES: Record<string, { accent: AccentName; tier: "gold" | "silver" }> = {
+  // Sample-data archetype names.
   "Regulatory Enforcement": { accent: "lime", tier: "gold" },
   "Permit / Project Filing": { accent: "mint", tier: "gold" },
   "Capacity / Infrastructure RFP": { accent: "lime", tier: "gold" },
   "Decarbonization Commitment": { accent: "cyan", tier: "silver" },
   "Initiative-Linked Hire": { accent: "grey", tier: "silver" },
+  // Live Kathairos archetypes (from icp_configs.config.archetypes).
+  "Pneumatic Methane Regulatory Deadline": { accent: "lime", tier: "gold" },
+  "Greenfield Pad / Well Permit": { accent: "mint", tier: "gold" },
+  "Operator-Linked Methane Plume / Enforcement": { accent: "cyan", tier: "silver" },
+  "Methane Programs Hiring + Public Commitment": { accent: "grey", tier: "silver" },
 };
+
+// Live `signals.archetype` is a code (A1..A4). Resolve to the human label we
+// render and key styling off of. Source: icp_configs.config.archetypes.
+export const CODE_TO_ARCHETYPE: Record<string, string> = {
+  A1: "Pneumatic Methane Regulatory Deadline",
+  A2: "Greenfield Pad / Well Permit",
+  A3: "Operator-Linked Methane Plume / Enforcement",
+  A4: "Methane Programs Hiring + Public Commitment",
+};
+
+export function archetypeLabel(codeOrName: string): string {
+  return CODE_TO_ARCHETYPE[codeOrName] ?? codeOrName;
+}
 
 export function archetypeStyle(archetype: string) {
   return ARCHETYPE_STYLES[archetype] ?? { accent: "grey" as const, tier: "silver" as const };

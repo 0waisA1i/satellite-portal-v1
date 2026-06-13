@@ -7,7 +7,13 @@ import DetailSheet, { type SheetMode } from "./DetailSheet";
 import SignalCard from "./SignalCard";
 import UpgradeBanner from "./UpgradeBanner";
 
-export default function FeedClient({ feed }: { feed: GatedFeed }) {
+export default function FeedClient({
+  feed,
+  basePath = "/",
+}: {
+  feed: GatedFeed;
+  basePath?: string;
+}) {
   const router = useRouter();
   const [sheet, setSheet] = useState<{
     signal: VisibleSignal;
@@ -23,7 +29,7 @@ export default function FeedClient({ feed }: { feed: GatedFeed }) {
   }, []);
 
   const upgrade = (to: Tier) => {
-    router.push(`/?tier=${to}`);
+    router.push(`${basePath}?tier=${to}`);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 

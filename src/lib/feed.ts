@@ -1,5 +1,6 @@
 import "server-only";
 import type {
+  Client,
   Contact,
   GatedFeed,
   Signal,
@@ -9,12 +10,16 @@ import type {
   VisibleSignal,
 } from "./types";
 import sample from "../../docs/sample_signals.json";
+import { hasSupabaseEnv } from "./supabase";
+import { fetchLiveFeed } from "./live";
 
 // Plan presets mirror the future `subscriptions` table (BuildSpec section 4).
-// The product is now a single "Signal Satellite" view: every plan sees all
-// surfaced signals, and the plan only decides which feature actions are
-// unlocked. When Supabase is wired, the row for the logged-in client replaces
-// this and the demo plan toggle goes away.
+// The product is a single "Signal Satellite" view: every plan sees all surfaced
+// signals, and the plan only decides which feature actions are unlocked. When a
+// real entitlements table exists, the row for the logged-in client replaces
+// this and the demo plan toggle goes away. The live DB has no subscriptions
+// table yet (only icp_configs.config.tier as a hint), so the demo toggle still
+// drives gating even against live data.
 const TIER_PRESETS: Record<Tier, Omit<Subscription, "current_period">> = {
   feed: {
     tier: "feed",
@@ -52,8 +57,8 @@ export function isTier(value: string | undefined): value is Tier {
 // Reduce a stored contact to what may leave the server. Titles are always
 // safe. Name/email/linkedin are revealed only when the contact has been
 // enriched AND the plan allows enrichment, so ungated PII never reaches the
-// browser. Enrichment itself is a later version, so today this returns
-// titles only on every plan.
+// browser. Enrichment itself is a later version, so today this returns titles
+// only on every plan.
 function maskContact(c: Contact, sub: Subscription): VisibleContact {
   const reveal = sub.enrich_enabled && c.enriched === true;
   return {
@@ -65,19 +70,17 @@ function maskContact(c: Contact, sub: Subscription): VisibleContact {
   };
 }
 
-export function getGatedFeed(tier: Tier): GatedFeed {
-  const data = sample as unknown as {
-    client: GatedFeed["client"];
-    subscription: Subscription;
-    signals: Signal[];
-  };
-
-  const subscription: Subscription = {
-    ...TIER_PRESETS[tier],
-    current_period: data.subscription.current_period,
-  };
-
-  const qualified = data.signals
+// The critical rule: gating happens here, on the server, before anything is
+// serialized to the browser. Every plan sees all surfaced signals for the
+// period (single view), but contact PII is masked per the plan. With live
+// Supabase this is still the place that enforces the contact mask; RLS will add
+// tenant isolation once auth maps a login to a client_id.
+function gate(
+  client: Client,
+  allSignals: Signal[],
+  subscription: Subscription,
+): GatedFeed {
+  const qualified = allSignals
     .filter(
       (s) =>
         s.surfaced &&
@@ -92,7 +95,7 @@ export function getGatedFeed(tier: Tier): GatedFeed {
   }));
 
   return {
-    client: data.client,
+    client,
     subscription,
     signals,
     stats: {
@@ -104,4 +107,35 @@ export function getGatedFeed(tier: Tier): GatedFeed {
       ),
     },
   };
+}
+
+// Reads from live Supabase when env is configured, otherwise the sample JSON.
+// `source` forces the choice: "demo" always uses the bundled sample (so the
+// /demo route works on Vercel even with live env set); "auto" prefers live and
+// falls back to sample. Either way the same server-side gating runs.
+export async function getGatedFeed(
+  tier: Tier,
+  opts: { source?: "auto" | "demo" } = {},
+): Promise<GatedFeed> {
+  const { source = "auto" } = opts;
+
+  if (source === "auto" && hasSupabaseEnv) {
+    const { client, signals, currentPeriod } = await fetchLiveFeed();
+    const subscription: Subscription = {
+      ...TIER_PRESETS[tier],
+      current_period: currentPeriod,
+    };
+    return gate(client, signals, subscription);
+  }
+
+  const data = sample as unknown as {
+    client: Client;
+    subscription: Subscription;
+    signals: Signal[];
+  };
+  const subscription: Subscription = {
+    ...TIER_PRESETS[tier],
+    current_period: data.subscription.current_period,
+  };
+  return gate(data.client, data.signals, subscription);
 }
