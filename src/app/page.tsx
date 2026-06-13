@@ -8,16 +8,13 @@ import { getGatedFeed, isTier } from "@/lib/feed";
 export default async function FeedPage({
   searchParams,
 }: {
-  searchParams: Promise<{ tier?: string; cap?: string }>;
+  searchParams: Promise<{ tier?: string }>;
 }) {
   const params = await searchParams;
-  const tier = isTier(params.tier) ? params.tier : "feed";
-  // Demo-only cap override (?cap=2) to preview the locked state while the
-  // sample set is smaller than the Feed cap of 5.
-  const cap = params.cap ? Number(params.cap) || undefined : undefined;
+  const tier = isTier(params.tier) ? params.tier : "command";
 
-  const feed = getGatedFeed(tier, cap);
-  const { client, subscription, signals, lockedCount, stats } = feed;
+  const feed = getGatedFeed(tier);
+  const { client, subscription, signals, stats } = feed;
 
   return (
     <div
@@ -31,7 +28,7 @@ export default async function FeedPage({
         <div className="mb-[8px] flex items-end justify-between gap-[24px] max-md:flex-col max-md:items-start">
           <div className="flex flex-col gap-[7px]">
             <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-lime/70">
-              Signal Feed · {formatPeriod(subscription.current_period)}
+              Signal Satellite · {formatPeriod(subscription.current_period)}
             </span>
             <h1 className="text-[34px] font-semibold leading-none tracking-[-0.025em]">
               This month&apos;s{" "}
@@ -74,9 +71,7 @@ export default async function FeedPage({
 
         <div className="mb-[16px] mt-[24px] flex items-center gap-[10px]">
           <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-txt-3">
-            {subscription.tier === "feed"
-              ? `Surfaced this period · ${signals.length} of ${signals.length + lockedCount}`
-              : `All signals · ${signals.length}`}
+            Surfaced this period · {signals.length}
           </span>
           <span className="h-px flex-1 bg-line" />
         </div>

@@ -4,7 +4,6 @@ import { useCallback, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { GatedFeed, Tier, VisibleSignal } from "@/lib/types";
 import DetailSheet, { type SheetMode } from "./DetailSheet";
-import LockedCard from "./LockedCard";
 import SignalCard from "./SignalCard";
 import UpgradeBanner from "./UpgradeBanner";
 
@@ -37,28 +36,18 @@ export default function FeedClient({ feed }: { feed: GatedFeed }) {
             signal={s}
             subscription={feed.subscription}
             onDetail={() => setSheet({ signal: s, mode: "detail" })}
-            onEnrich={() => setSheet({ signal: s, mode: "detail" })}
+            onEnrich={() =>
+              showToast("Enrichment runs in a later version")
+            }
             onOutreach={() => setSheet({ signal: s, mode: "outreach" })}
-            onSlack={() =>
-              showToast(
-                `Pushed "${s.account.name}" to #${feed.client.code.toLowerCase()}-signals on Slack`,
-              )
+            onCrm={() =>
+              showToast(`Pushed "${s.account.name}" to your CRM as a task`)
             }
           />
         ))}
-        {feed.lockedCount > 0 && (
-          <LockedCard
-            lockedCount={feed.lockedCount}
-            onUpgrade={() => upgrade("stack")}
-          />
-        )}
       </div>
 
-      <UpgradeBanner
-        tier={feed.subscription.tier}
-        lockedCount={feed.lockedCount}
-        onUpgrade={upgrade}
-      />
+      <UpgradeBanner tier={feed.subscription.tier} onUpgrade={upgrade} />
 
       <DetailSheet
         signal={sheet?.signal ?? null}

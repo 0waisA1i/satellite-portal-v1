@@ -31,18 +31,20 @@ Key visual elements to reproduce:
 
 Full schema and rationale: `docs/Satellite_Portal_BuildSpec.md`. Read it before designing types.
 
-Three subscription tiers gate what a client sees and does:
+**Product decision (2026-06-13, supersedes the original tier model below):** there is now a single view, **Signal Satellite**, shown to every plan. All surfaced signals are visible on every plan; the plan no longer caps how many signals you see. Instead the plan gates which **feature actions** are unlocked, shown with a subtle locked/unlocked styling difference (all buttons always render; locked ones are dimmed with a small lock and a tooltip naming the plan that unlocks them). Decision-makers always show **titles only** (for example "VP, Environmental Health & Safety"); the named contact, email, and LinkedIn are revealed only once a contact is enriched, which is a later-version feature. "Push to Slack" is replaced by **"Push to CRM."**
+
+Current plan to feature mapping (in `src/lib/feed.ts`, easy to change):
 
 | | Signal Feed | Signal Stack | Signal Command |
 |---|---|---|---|
-| Signals visible | 5 / month | Unlimited | Unlimited |
+| Signals visible | All surfaced | All surfaced | All surfaced |
 | Segments | 1 | Up to 2 | Up to 4 |
-| Decision-makers | Titles + angle only | Enriched named contacts | Enriched named contacts |
-| Outreach | none | Generate script | Generate script |
-| Delivery | Digest + portal | Digest + portal | + Slack push |
-| CRM enrichment | none | Yes | Yes |
+| Decision-makers | Titles only | Titles only (+ enrich to reveal) | Titles only (+ enrich to reveal) |
+| Find & enrich | locked | unlocked | unlocked |
+| Generate outreach | locked | unlocked | unlocked |
+| Push to CRM | locked | locked | unlocked |
 
-The gating is the product. Critical rule: **gate server-side, never client-side.** A Feed-tier client's locked signals and the `contacts` rows must never leave the database. The mockup blurs in CSS for demo purposes only; production must not send locked content to the browser. Show a count and an upgrade call to action instead.
+The gating is still the product. Critical rule: **gate server-side, never client-side.** Contact names, emails, and LinkedIn URLs must never leave the server until a contact is enriched and the plan allows it; the server sends titles only. The mockup blurs in CSS for demo purposes only; production must not send gated content to the browser.
 
 `docs/sample_signals.json` is sample data in the standardized shape. Use it to build the UI before the live DB is connected. It contains no real client data.
 

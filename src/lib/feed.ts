@@ -1,44 +1,45 @@
 import "server-only";
 import type {
+  Contact,
   GatedFeed,
   Signal,
   Subscription,
   Tier,
+  VisibleContact,
   VisibleSignal,
 } from "./types";
 import sample from "../../docs/sample_signals.json";
 
-// Tier presets mirror the future `subscriptions` table (BuildSpec section 4).
-// When Supabase is wired, the row for the logged-in client replaces this and
-// the demo tier toggle goes away.
+// Plan presets mirror the future `subscriptions` table (BuildSpec section 4).
+// The product is now a single "Signal Satellite" view: every plan sees all
+// surfaced signals, and the plan only decides which feature actions are
+// unlocked. When Supabase is wired, the row for the logged-in client replaces
+// this and the demo plan toggle goes away.
 const TIER_PRESETS: Record<Tier, Omit<Subscription, "current_period">> = {
   feed: {
     tier: "feed",
     segment_limit: 1,
-    signal_cap: 5,
     enrich_enabled: false,
     outreach_enabled: false,
-    slack_enabled: false,
+    crm_enabled: false,
   },
   stack: {
     tier: "stack",
     segment_limit: 2,
-    signal_cap: null,
     enrich_enabled: true,
     outreach_enabled: true,
-    slack_enabled: false,
+    crm_enabled: false,
   },
   command: {
     tier: "command",
     segment_limit: 4,
-    signal_cap: null,
     enrich_enabled: true,
     outreach_enabled: true,
-    slack_enabled: true,
+    crm_enabled: true,
   },
 };
 
-export const TIER_LABELS: Record<Tier, string> = {
+export const PLAN_LABELS: Record<Tier, string> = {
   feed: "Signal Feed",
   stack: "Signal Stack",
   command: "Signal Command",
@@ -48,12 +49,23 @@ export function isTier(value: string | undefined): value is Tier {
   return value === "feed" || value === "stack" || value === "command";
 }
 
-// The critical rule: gating happens here, on the server, before anything is
-// serialized to the browser. Locked signals are reduced to a count; contacts
-// are stripped unless the subscription has enrich_enabled. When Supabase is
-// wired, this becomes the gated query (LIMIT signal_cap + COUNT of the rest)
-// and RLS handles tenant isolation.
-export function getGatedFeed(tier: Tier, capOverride?: number): GatedFeed {
+// Reduce a stored contact to what may leave the server. Titles are always
+// safe. Name/email/linkedin are revealed only when the contact has been
+// enriched AND the plan allows enrichment, so ungated PII never reaches the
+// browser. Enrichment itself is a later version, so today this returns
+// titles only on every plan.
+function maskContact(c: Contact, sub: Subscription): VisibleContact {
+  const reveal = sub.enrich_enabled && c.enriched === true;
+  return {
+    title: c.title,
+    enriched: reveal,
+    name: reveal ? c.name : null,
+    email: reveal ? c.email : null,
+    linkedin_url: reveal ? c.linkedin_url : null,
+  };
+}
+
+export function getGatedFeed(tier: Tier): GatedFeed {
   const data = sample as unknown as {
     client: GatedFeed["client"];
     subscription: Subscription;
@@ -74,19 +86,15 @@ export function getGatedFeed(tier: Tier, capOverride?: number): GatedFeed {
     )
     .sort((a, b) => b.confidence_current - a.confidence_current);
 
-  const cap = capOverride ?? subscription.signal_cap;
-  const unlocked = cap === null ? qualified : qualified.slice(0, cap);
-
-  const signals: VisibleSignal[] = unlocked.map(({ contacts, ...rest }) => ({
+  const signals: VisibleSignal[] = qualified.map(({ contacts, ...rest }) => ({
     ...rest,
-    contacts: subscription.enrich_enabled ? contacts : null,
+    contacts: contacts.map((c) => maskContact(c, subscription)),
   }));
 
   return {
     client: data.client,
     subscription,
     signals,
-    lockedCount: qualified.length - unlocked.length,
     stats: {
       total: qualified.length,
       active: qualified.filter((s) => s.status === "active").length,

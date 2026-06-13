@@ -35,10 +35,10 @@ function Sec({
 }
 
 function outreachDraft(s: VisibleSignal): string {
-  const first = s.contacts?.[0]?.name.split(" ")[0] ?? "there";
+  const greeting = s.contacts[0]?.name?.split(" ")[0] ?? "there";
   return `Subject: ${s.why_now}: quick thought for ${s.account.name}
 
-Hi ${first},
+Hi ${greeting},
 
 Saw ${s.account.name}'s ${s.trigger_label.toLowerCase()} (${s.archetype.toLowerCase()}). With ${s.why_now.toLowerCase()} on the clock, most teams in your position are weighing how to get to documented compliance fast without pulling ops off-cycle.
 
@@ -150,7 +150,6 @@ export default function DetailSheet({
                   </div>
                   <div className="mt-[3px] text-[12.5px] text-txt-2">
                     Drafted on the {signal.archetype.toLowerCase()} trigger
-                    {signal.contacts?.[0] ? ` · to ${signal.contacts[0].name}` : ""}
                   </div>
                 </>
               )}
@@ -180,33 +179,21 @@ export default function DetailSheet({
                       {signal.suggested_next_step}
                     </div>
                   </Sec>
-                  {subscription.enrich_enabled && signal.contacts ? (
-                    <Sec num="5" title="Enriched decision-makers">
-                      {signal.contacts.map((c) => (
-                        <ContactRow key={c.name} contact={c} />
-                      ))}
+                  <Sec num="5" title="Decision-makers to reach">
+                    {signal.contacts.map((c, i) => (
+                      <ContactRow key={`${c.title}-${i}`} contact={c} />
+                    ))}
+                    <div className="mt-[9px] text-[11px] leading-[1.4] text-txt-2">
+                      {signal.outreach_angle}
+                    </div>
+                    {subscription.enrich_enabled ? (
                       <div className="mt-[12px]">
                         <button className={btnAccent} onClick={onOutreach}>
                           <PenIcon />
                           Generate outreach
                         </button>
                       </div>
-                    </Sec>
-                  ) : (
-                    <Sec num="5" title="Decision-makers to reach">
-                      <div className="flex flex-wrap items-center gap-[7px]">
-                        {signal.target_titles.map((t) => (
-                          <span
-                            key={t}
-                            className="rounded-[7px] border border-line bg-white/5 px-[9px] py-[3px] text-[11px] font-medium"
-                          >
-                            {t}
-                          </span>
-                        ))}
-                      </div>
-                      <div className="mt-[9px] text-[11px] leading-[1.4] text-txt-2">
-                        {signal.outreach_angle}
-                      </div>
+                    ) : (
                       <div className="mt-[12px] flex items-center">
                         <button
                           className={`${btnGhost} cursor-not-allowed border-dashed text-txt-4`}
@@ -219,8 +206,8 @@ export default function DetailSheet({
                           Available on Signal Stack
                         </span>
                       </div>
-                    </Sec>
-                  )}
+                    )}
+                  </Sec>
                   <Sec num="6" title="Signal facts">
                     <dl className="grid grid-cols-[130px_1fr] gap-x-[16px] gap-y-[8px] text-[12.5px]">
                       <dt className="font-semibold text-txt-3">Signal ID</dt>
