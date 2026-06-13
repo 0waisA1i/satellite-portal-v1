@@ -1,7 +1,7 @@
 {
-  "_comment": "Sample data in the standardized Stage 7 shape. Use for UI development before the live Supabase connection is wired. One account per signal. Replace with live data from Owais's Supabase once connected. No real client data here.",
+  "_comment": "Sample data in the standardized Stage 7 shape. Used for UI development and the /demo route, before/independent of the live Supabase connection. One account per signal. No real client data here. All companies and contacts are fictional.",
   "client": { "id": "demo", "name": "Acme Energy", "code": "AE", "accent": "lime" },
-  "subscription": { "tier": "feed", "segment_limit": 1, "signal_cap": 5, "enrich_enabled": false, "outreach_enabled": false, "slack_enabled": false, "current_period": "2026-06" },
+  "subscription": { "tier": "command", "segment_limit": 4, "enrich_enabled": true, "outreach_enabled": true, "crm_enabled": true, "current_period": "2026-06" },
   "signals": [
     {
       "signal_id": "AE-001",
@@ -27,8 +27,8 @@
       "surfaced": true,
       "surfaced_period": "2026-06",
       "contacts": [
-        { "name": "Dana Whitfield", "title": "VP, Environmental Health & Safety", "email": "d.•••@northwind-op.com", "linkedin_url": "https://linkedin.com/in/..." },
-        { "name": "Marcus Reyes", "title": "Regulatory Compliance Counsel", "email": "m.•••@northwind-op.com", "linkedin_url": "https://linkedin.com/in/..." }
+        { "name": "Dana Whitfield", "title": "VP, Environmental Health & Safety", "email": "dana.whitfield@northwind-op.example", "linkedin_url": "https://linkedin.com/in/dana-whitfield", "enriched": true },
+        { "name": "Marcus Reyes", "title": "Regulatory Compliance Counsel", "email": "marcus.reyes@northwind-op.example", "linkedin_url": "https://linkedin.com/in/marcus-reyes", "enriched": true }
       ]
     },
     {
@@ -55,7 +55,61 @@
       "surfaced": true,
       "surfaced_period": "2026-06",
       "contacts": [
-        { "name": "Priya Anand", "title": "Director, Sustainability", "email": "p.•••@cascaderes.com", "linkedin_url": "https://linkedin.com/in/..." }
+        { "name": "Priya Anand", "title": "Director, Sustainability", "email": "priya.anand@cascaderes.example", "linkedin_url": "https://linkedin.com/in/priya-anand", "enriched": true }
+      ]
+    },
+    {
+      "signal_id": "AE-003",
+      "archetype": "Decarbonization Commitment",
+      "account": { "name": "Summit Basin Energy", "sector": "Midstream gas", "geo": "Colorado (DJ Basin)" },
+      "title": "Public net-zero pledge with 2027 interim target",
+      "trigger_label": "Public commitment",
+      "why_now": "Interim target locked for 2027",
+      "summary": "Issued a public decarbonization commitment naming a 2027 interim methane-intensity target ahead of a 2035 net-zero goal. The release names specific gathering systems in scope.",
+      "signal_intelligence": "Commitment is dated and quantified, not aspirational. Named assets make it actionable rather than a generic ESG statement.",
+      "suggested_next_step": "Map the named gathering systems to current venting sources. Brief the sustainability office on a measurement-to-abatement path that hits the 2027 interim number.",
+      "target_titles": ["Chief Sustainability Officer", "VP Operations"],
+      "outreach_angle": "Anchor on the 2027 interim target they have already made public. Offer the documented path to hit it on the named systems.",
+      "false_positive_filter": "Net-zero language with no date or no named assets; re-announcements of old pledges.",
+      "rank_boost_flags": ["Quantified interim target", "Named assets in scope", "Public commitment", "Executive sponsor implied"],
+      "confidence_current": 79,
+      "deadline_date": "2027-01-31",
+      "act_within_days": 120,
+      "est_volume": "6 to 10 / mo",
+      "status": "active",
+      "source_url": "https://example.com/summit-basin/net-zero",
+      "source_verified": true,
+      "surfaced": true,
+      "surfaced_period": "2026-06",
+      "contacts": [
+        { "name": "Helen Ortiz", "title": "Chief Sustainability Officer", "email": "helen.ortiz@summitbasin.example", "linkedin_url": "https://linkedin.com/in/helen-ortiz", "enriched": true }
+      ]
+    },
+    {
+      "signal_id": "AE-004",
+      "archetype": "Initiative-Linked Hire",
+      "account": { "name": "Cedar Peak Resources", "sector": "Upstream oil & gas", "geo": "North Dakota (Bakken)" },
+      "title": "New Director of Emissions Management role posted",
+      "trigger_label": "Initiative-linked hire",
+      "why_now": "Role open, program standing up",
+      "summary": "Posted a newly created Director of Emissions Management position citing a build-out of leak detection and repair (LDAR) and pneumatic retrofit programs across Bakken assets.",
+      "signal_intelligence": "A net-new role tied explicitly to an emissions program signals budget and intent forming now, before tooling is locked in.",
+      "suggested_next_step": "Reach the hiring VP and the new director once seated. Offer a program template so your solution is the default in their first 90-day plan.",
+      "target_titles": ["VP Operations", "Director Emissions Management"],
+      "outreach_angle": "Get in before the new director picks tooling. Bring a 90-day LDAR-plus-pneumatic plan they can adopt on day one.",
+      "false_positive_filter": "Generic EHS reqs with no program language; backfills of existing roles.",
+      "rank_boost_flags": ["Net-new role", "Program build-out language", "Budget forming", "Named asset region"],
+      "confidence_current": 73,
+      "deadline_date": "2026-10-01",
+      "act_within_days": 75,
+      "est_volume": "4 to 7 / mo",
+      "status": "active",
+      "source_url": "https://example.com/cedarpeak/careers/dir-emissions",
+      "source_verified": true,
+      "surfaced": true,
+      "surfaced_period": "2026-06",
+      "contacts": [
+        { "name": "Owen Brady", "title": "VP, Operations", "email": "owen.brady@cedarpeak.example", "linkedin_url": "https://linkedin.com/in/owen-brady", "enriched": false }
       ]
     },
     {
@@ -82,8 +136,144 @@
       "surfaced": true,
       "surfaced_period": "2026-06",
       "contacts": [
-        { "name": "Raymond Cho", "title": "Director, Grid Modernization", "email": "r.•••@harborgrid.com", "linkedin_url": "https://linkedin.com/in/..." },
-        { "name": "Aisha Bello", "title": "Senior Procurement Lead", "email": "a.•••@harborgrid.com", "linkedin_url": "https://linkedin.com/in/..." }
+        { "name": "Raymond Cho", "title": "Director, Grid Modernization", "email": "raymond.cho@harborgrid.example", "linkedin_url": "https://linkedin.com/in/raymond-cho", "enriched": true },
+        { "name": "Aisha Bello", "title": "Senior Procurement Lead", "email": "aisha.bello@harborgrid.example", "linkedin_url": "https://linkedin.com/in/aisha-bello", "enriched": true }
+      ]
+    },
+    {
+      "signal_id": "AE-006",
+      "archetype": "Regulatory Enforcement",
+      "account": { "name": "Verde Midstream Partners", "sector": "Midstream gas", "geo": "Texas (Permian)" },
+      "title": "Consent decree on flaring exceedances",
+      "trigger_label": "Consent decree",
+      "why_now": "Compliance milestones start in 90 days",
+      "summary": "Entered a consent decree resolving repeated flaring-volume exceedances, with staged compliance milestones beginning within the quarter and third-party verification required.",
+      "signal_intelligence": "A consent decree is a hard, dated obligation with penalties for slippage. Third-party verification language signals budget for measurement and abatement.",
+      "suggested_next_step": "Map the decree milestones to current flaring sources. Approach compliance and operations jointly with a measurement-plus-abatement plan that clears the first milestone.",
+      "target_titles": ["VP / Director EHS", "Director Operations"],
+      "outreach_angle": "Lead with the first dated milestone in the decree and the verification requirement. Offer the lowest-risk path to clear it on time.",
+      "false_positive_filter": "Settlements with no operational milestones; decrees already fully satisfied.",
+      "rank_boost_flags": ["Binding consent decree", "Dated milestones (90d)", "Third-party verification", "Penalty exposure"],
+      "confidence_current": 93,
+      "deadline_date": "2026-09-30",
+      "act_within_days": 28,
+      "est_volume": "7 to 11 / mo",
+      "status": "active",
+      "source_url": "https://example.gov/enforcement/verde-decree",
+      "source_verified": true,
+      "surfaced": true,
+      "surfaced_period": "2026-06",
+      "contacts": [
+        { "name": "Sofia Marquez", "title": "VP, Environmental Health & Safety", "email": "sofia.marquez@verdemid.example", "linkedin_url": "https://linkedin.com/in/sofia-marquez", "enriched": true }
+      ]
+    },
+    {
+      "signal_id": "AE-007",
+      "archetype": "Permit / Project Filing",
+      "account": { "name": "Tallgrass Operating Inc.", "sector": "Upstream oil & gas", "geo": "Oklahoma (Anadarko)" },
+      "title": "Compression station expansion permit",
+      "trigger_label": "New permit filed",
+      "why_now": "Construction window opens Q4",
+      "summary": "Filed an air permit for a compression station expansion, adding units that change the facility's pneumatic and venting profile during construction next quarter.",
+      "signal_intelligence": "A dated, named infrastructure expansion creates a fresh design window where zero-vent equipment can be specified before build.",
+      "suggested_next_step": "Reach facilities engineering during design, not after. Offer a zero-vent specification for the new compression units tied to the permit scope.",
+      "target_titles": ["Director Facilities Engineering", "Director Sustainability"],
+      "outreach_angle": "Get the zero-vent spec into the design before the Q4 build. Reference the permit and the added units by name.",
+      "false_positive_filter": "Renewal permits with no new equipment; filings later withdrawn.",
+      "rank_boost_flags": ["Named facility expansion", "Design window open", "Regulatory hot zone", "Equipment-spec opportunity"],
+      "confidence_current": 81,
+      "deadline_date": "2026-11-01",
+      "act_within_days": 55,
+      "est_volume": "9 to 14 / mo",
+      "status": "active",
+      "source_url": "https://example.gov/air-permit/tallgrass",
+      "source_verified": true,
+      "surfaced": true,
+      "surfaced_period": "2026-06",
+      "contacts": [
+        { "name": "Derek Lin", "title": "Director, Facilities Engineering", "email": "derek.lin@tallgrass-op.example", "linkedin_url": "https://linkedin.com/in/derek-lin", "enriched": false }
+      ]
+    },
+    {
+      "signal_id": "AE-008",
+      "archetype": "Decarbonization Commitment",
+      "account": { "name": "Halcyon Renewables Corp.", "sector": "Power generation", "geo": "California" },
+      "title": "Methane-intensity disclosure tied to financing",
+      "trigger_label": "Financing-linked target",
+      "why_now": "Reporting covenant starts next quarter",
+      "summary": "Disclosed a methane-intensity target embedded in a sustainability-linked financing facility, with the first reporting covenant due next quarter and a pricing step-up if missed.",
+      "signal_intelligence": "Financing-linked targets carry real money consequences, which moves them from ESG optics to operational priority with executive attention.",
+      "suggested_next_step": "Brief the CFO office and sustainability lead on measurement that satisfies the covenant. Tie abatement to avoiding the pricing step-up.",
+      "target_titles": ["Chief Sustainability Officer", "VP Finance"],
+      "outreach_angle": "Connect the covenant and the pricing step-up to a measurement-and-abatement plan that protects their financing terms.",
+      "false_positive_filter": "Voluntary disclosures with no financial linkage; targets with no near-term reporting date.",
+      "rank_boost_flags": ["Financing-linked target", "Near-term covenant", "Penalty (pricing step-up)", "Executive sponsor"],
+      "confidence_current": 77,
+      "deadline_date": "2026-09-30",
+      "act_within_days": 60,
+      "est_volume": "5 to 8 / mo",
+      "status": "active",
+      "source_url": "https://example.com/halcyon/sustainability-linked-facility",
+      "source_verified": true,
+      "surfaced": true,
+      "surfaced_period": "2026-06",
+      "contacts": [
+        { "name": "Nadia Khan", "title": "Chief Sustainability Officer", "email": "nadia.khan@halcyonren.example", "linkedin_url": "https://linkedin.com/in/nadia-khan", "enriched": false }
+      ]
+    },
+    {
+      "signal_id": "AE-009",
+      "archetype": "Capacity / Infrastructure RFP",
+      "account": { "name": "Ironwood Public Utilities", "sector": "Electric utility, T&D", "geo": "US (Midwest)" },
+      "title": "Substation automation RFP, two-stage bid",
+      "trigger_label": "Open RFP",
+      "why_now": "Stage-one responses due Sept 5",
+      "summary": "Issued a two-stage RFP for substation automation and monitoring, with stage-one technical responses due in early September and a shortlist to follow.",
+      "signal_intelligence": "Two-stage procurement with a near technical deadline favors vendors who engage early to shape stage-two requirements.",
+      "suggested_next_step": "Submit a strong stage-one technical response and request a clarification call to influence the shortlist criteria before stage two.",
+      "target_titles": ["Director Substation Engineering", "Procurement Lead"],
+      "outreach_angle": "Shape the stage-two criteria now by leading stage one. Map directly to the named automation scope.",
+      "false_positive_filter": "Single-stage RFQs already awarded; information requests with no bid path.",
+      "rank_boost_flags": ["Open dated RFP", "Two-stage process", "Named technical scope", "Early-engagement leverage"],
+      "confidence_current": 83,
+      "deadline_date": "2026-09-05",
+      "act_within_days": 22,
+      "est_volume": "4 to 8 / mo",
+      "status": "active",
+      "source_url": "https://example.com/ironwood/substation-rfp",
+      "source_verified": true,
+      "surfaced": true,
+      "surfaced_period": "2026-06",
+      "contacts": [
+        { "name": "Grace Sullivan", "title": "Director, Substation Engineering", "email": "grace.sullivan@ironwoodpu.example", "linkedin_url": "https://linkedin.com/in/grace-sullivan", "enriched": true },
+        { "name": "Tom Becker", "title": "Procurement Lead", "email": "tom.becker@ironwoodpu.example", "linkedin_url": "https://linkedin.com/in/tom-becker", "enriched": true }
+      ]
+    },
+    {
+      "signal_id": "AE-010",
+      "archetype": "Initiative-Linked Hire",
+      "account": { "name": "Lumen Grid Partners", "sector": "Renewable IPP", "geo": "Arizona" },
+      "title": "Head of Asset Performance hire announced",
+      "trigger_label": "Initiative-linked hire",
+      "why_now": "Mandate names monitoring build-out",
+      "summary": "Announced a Head of Asset Performance hire whose stated mandate includes standing up fleet-wide monitoring and analytics for a growing renewables portfolio.",
+      "signal_intelligence": "A named executive with a monitoring mandate is a buying-center forming around exactly the category being sold, with a fresh budget cycle.",
+      "suggested_next_step": "Congratulate and engage the new head with a portfolio monitoring blueprint. Offer a pilot scoped to their first reporting milestone.",
+      "target_titles": ["Head of Asset Performance", "VP Engineering"],
+      "outreach_angle": "Bring a fleet-wide monitoring blueprint to the new head before they build it in-house. Offer a fast pilot.",
+      "false_positive_filter": "Hires with no stated monitoring mandate; promotions within unrelated functions.",
+      "rank_boost_flags": ["Executive hire", "Monitoring mandate explicit", "Portfolio scale", "New budget cycle"],
+      "confidence_current": 71,
+      "deadline_date": "2026-10-15",
+      "act_within_days": 95,
+      "est_volume": "3 to 6 / mo",
+      "status": "stale",
+      "source_url": "https://example.com/lumengrid/news/asset-performance-lead",
+      "source_verified": false,
+      "surfaced": true,
+      "surfaced_period": "2026-06",
+      "contacts": [
+        { "name": "Iris Navarro", "title": "Head of Asset Performance", "email": "iris.navarro@lumengrid.example", "linkedin_url": "https://linkedin.com/in/iris-navarro", "enriched": false }
       ]
     }
   ]
