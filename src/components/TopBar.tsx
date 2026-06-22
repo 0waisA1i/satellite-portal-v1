@@ -1,5 +1,6 @@
 import type { Client, Tier } from "@/lib/types";
 import { PLAN_LABELS } from "@/lib/feed";
+import AvatarMenu from "./AvatarMenu";
 
 function Logo() {
   return (
@@ -49,9 +50,7 @@ export default function TopBar({ client, tier }: { client: Client; tier: Tier })
         <span className="rounded-full border border-line bg-panel px-[10px] py-[5px] text-[9.5px] font-semibold uppercase tracking-[0.08em] text-txt-3">
           {PLAN_LABELS[tier]} plan
         </span>
-        <div className="flex h-[32px] w-[32px] items-center justify-center rounded-full border border-line-2 bg-gradient-to-br from-[#2a2a2a] to-[#111] text-[12px] font-bold text-txt-2">
-          {client.code}
-        </div>
+        <AvatarMenu code={client.code} />
       </div>
     </div>
   );

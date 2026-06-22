@@ -105,25 +105,25 @@ export interface LiveFeed {
   currentPeriod: string;
 }
 
-// Reads the (single, seeded) client and its signals. When real auth lands this
-// should scope to the logged-in client's id via an RLS-backed anon client.
-export async function fetchLiveFeed(): Promise<LiveFeed> {
+// Reads the client and its signals. When clientId is provided (post-login flow)
+// the query is scoped to that client. Without it, falls back to the first seeded
+// client — useful for local dev without auth wired up.
+export async function fetchLiveFeed(clientId?: string): Promise<LiveFeed> {
   const supabase = getServerSupabase();
   const now = new Date();
   const currentPeriod = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 
-  const { data: icp, error: icpError } = await supabase
-    .from("icp_configs")
-    .select("client_id, client_name")
-    .limit(1)
-    .single();
+  const icpBase = supabase.from("icp_configs").select("client_id, client_name");
+  const { data: icp, error: icpError } = await (
+    clientId ? icpBase.eq("client_id", clientId) : icpBase.limit(1)
+  ).single();
   if (icpError) throw new Error(`icp_configs read failed: ${icpError.message}`);
 
-  const clientId = icp.client_id;
+  const resolvedClientId = icp.client_id;
   const client: Client = {
-    id: clientId,
+    id: resolvedClientId,
     name: icp.client_name,
-    code: clientId.slice(0, 3).toUpperCase(),
+    code: resolvedClientId.slice(0, 3).toUpperCase(),
     accent: "lime", // GAP: no per-client accent column; default brand accent
   };
 
@@ -131,9 +131,9 @@ export async function fetchLiveFeed(): Promise<LiveFeed> {
     supabase
       .from("signals")
       .select("*")
-      .eq("client_id", clientId)
+      .eq("client_id", resolvedClientId)
       .order("current_confidence", { ascending: false }),
-    supabase.from("approach_windows").select("*").eq("client_id", clientId),
+    supabase.from("approach_windows").select("*").eq("client_id", resolvedClientId),
   ]);
   if (sigError) throw new Error(`signals read failed: ${sigError.message}`);
 

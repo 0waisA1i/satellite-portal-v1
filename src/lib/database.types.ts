@@ -8,6 +8,10 @@
 // Only four objects are exposed in `public`: signals, icp_configs, scan_runs (tables)
 // and approach_windows (a view). There is no clients, subscriptions, accounts, or
 // contacts table yet.
+//
+// user_clients is the expected auth-to-client mapping table (not yet introspected).
+// Expected schema: { user_id uuid FK auth.users, client_id text FK icp_configs.client_id }
+// Create it in Supabase before enabling the login flow.
 
 export type SignalRow = {
   id: string; // uuid, pk
@@ -88,9 +92,21 @@ export type ApproachWindowRow = {
 // output: tables need Row/Insert/Update/Relationships, views need Row, and the
 // schema needs Functions/Enums/CompositeTypes). The portal only reads, so
 // Insert/Update mirror Row.
+export type UserClientRow = {
+  user_id: string; // uuid, FK to auth.users
+  client_id: string; // text short code, FK to icp_configs.client_id
+  created_at: string | null; // timestamptz
+};
+
 export interface Database {
   public: {
     Tables: {
+      user_clients: {
+        Row: UserClientRow;
+        Insert: UserClientRow;
+        Update: Partial<UserClientRow>;
+        Relationships: [];
+      };
       signals: {
         Row: SignalRow;
         Insert: SignalRow;

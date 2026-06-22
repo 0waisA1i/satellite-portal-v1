@@ -14,6 +14,7 @@ export interface Client {
 // FEATURES are unlocked, not which signals are visible.
 export interface Subscription {
   tier: Tier;
+  signal_cap: number; // max signals surfaced to the client; Infinity = no cap
   segment_limit: number;
   enrich_enabled: boolean; // can reveal named contacts
   outreach_enabled: boolean; // can generate outreach
@@ -88,5 +89,8 @@ export interface GatedFeed {
   client: Client;
   subscription: Subscription;
   signals: VisibleSignal[];
+  // Next up to 3 signals beyond the cap, contacts stripped. Used to render
+  // blurred teaser cards without leaking any gated content to the browser.
+  teaserSignals: VisibleSignal[];
   stats: FeedStats;
 }

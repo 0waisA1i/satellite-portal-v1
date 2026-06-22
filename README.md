@@ -1,27 +1,58 @@
 # Satellite Portal
 
-The client-facing web app for Satellite, CleanTech GrowthLab's signal-scouting product (Stage 8: Surface). It reads scored buying signals from the Stage 7 Supabase store and presents them as a gated, multi-tenant portal.
+Client-facing web app for CleanTech GrowthLab's Satellite product. Reads scored buying signals from Supabase and presents them as a gated, multi-tenant portal. This is Stage 8 (Surface) — it does not run the signal pipeline, only reads from it.
 
-Project context lives in `CLAUDE.md` (read first). The visual contract is `docs/Satellite_Portal_Mockup.html`; the data contract is `docs/Satellite_Portal_BuildSpec.md`.
+## Prerequisites
 
-## Current state
+- Node.js 18+
+- npm 9+
 
-- Feed page built against `docs/sample_signals.json` (no database connected yet).
-- Tier gating runs server-side from day one: locked signals and contact rows are filtered in the Server Component (`src/lib/feed.ts`) and never reach the browser. Locked content is a count plus an upgrade call to action.
-- The "Preview tier" bar is a demo control while we run on sample data. Each toggle re-renders through the server gate via the URL (`?tier=feed|stack|command`). Add `&cap=2` to preview the locked-card state (the sample set is smaller than the Feed cap of 5).
-- Outreach generation is a stub per the v1 definition of done.
+## Setup
 
-## Run it
-
-```
+```bash
+git clone <repo-url>
+cd satellite-portal
 npm install
+cp .env.example .env.local
+```
+
+Edit `.env.local` and fill in the three keys (get values from Owais):
+
+| Variable | Description |
+|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public anon key (safe for the browser) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Service role key — server-only, never expose to the browser |
+
+Use a dev/staging Supabase project, not production.
+
+## Run locally
+
+```bash
 npm run dev
 ```
 
-Open http://localhost:3000.
+Opens at [http://localhost:3000](http://localhost:3000).
 
-## Next steps
+## Routes
 
-1. Connect Supabase (keys from Owais in `.env.local`, see `.env.example`): introspect the live schema, generate types, map fields, list gaps.
-2. Supabase Auth + RLS for tenant isolation, replacing the demo tier toggle with the real subscription row.
-3. Deploy to Vercel with env-based config.
+| Route | Data source | Notes |
+|---|---|---|
+| `/demo` | Bundled sample data (`docs/sample_signals.json`) | Always works without env vars. Safe for client demos. |
+| `/` | Live Supabase | Falls back to sample data if env vars are not set. |
+
+Both routes accept a `?tier=feed|stack|command` query param to switch the active plan. In production the tier comes from the authenticated client's subscription row.
+
+## Tier gating
+
+Gating runs server-side in `src/lib/feed.ts`. The plan controls signal visibility (Feed: 5, Stack: 15, Command: all) and which feature actions are unlocked (enrich contacts, generate outreach, push to CRM). Contact PII never leaves the server until a contact is enriched and the plan permits it.
+
+## Stack
+
+Next.js (App Router) · React 19 · TypeScript · Tailwind CSS 4 · Supabase
+
+## Project context
+
+- Visual contract: `docs/Satellite_Portal_Mockup.html`
+- Data contract: `docs/Satellite_Portal_BuildSpec.md`
+- Full product brief: `CLAUDE.md`

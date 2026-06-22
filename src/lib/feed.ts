@@ -23,6 +23,7 @@ import { fetchLiveFeed } from "./live";
 const TIER_PRESETS: Record<Tier, Omit<Subscription, "current_period">> = {
   feed: {
     tier: "feed",
+    signal_cap: 5,
     segment_limit: 1,
     enrich_enabled: false,
     outreach_enabled: false,
@@ -30,6 +31,7 @@ const TIER_PRESETS: Record<Tier, Omit<Subscription, "current_period">> = {
   },
   stack: {
     tier: "stack",
+    signal_cap: 15,
     segment_limit: 2,
     enrich_enabled: true,
     outreach_enabled: true,
@@ -37,6 +39,7 @@ const TIER_PRESETS: Record<Tier, Omit<Subscription, "current_period">> = {
   },
   command: {
     tier: "command",
+    signal_cap: Infinity,
     segment_limit: 4,
     enrich_enabled: true,
     outreach_enabled: true,
@@ -89,15 +92,22 @@ function gate(
     )
     .sort((a, b) => b.confidence_current - a.confidence_current);
 
-  const signals: VisibleSignal[] = qualified.map(({ contacts, ...rest }) => ({
+  const capped = qualified.slice(0, subscription.signal_cap);
+
+  const signals: VisibleSignal[] = capped.map(({ contacts, ...rest }) => ({
     ...rest,
     contacts: contacts.map((c) => maskContact(c, subscription)),
   }));
+
+  const teaserSignals: VisibleSignal[] = qualified
+    .slice(subscription.signal_cap, subscription.signal_cap + 1)
+    .map(({ contacts: _contacts, ...rest }) => ({ ...rest, contacts: [] }));
 
   return {
     client,
     subscription,
     signals,
+    teaserSignals,
     stats: {
       total: qualified.length,
       active: qualified.filter((s) => s.status === "active").length,
@@ -113,14 +123,15 @@ function gate(
 // `source` forces the choice: "demo" always uses the bundled sample (so the
 // /demo route works on Vercel even with live env set); "auto" prefers live and
 // falls back to sample. Either way the same server-side gating runs.
+// `clientId` scopes the live read to a specific client (set from the auth cookie).
 export async function getGatedFeed(
   tier: Tier,
-  opts: { source?: "auto" | "demo" } = {},
+  opts: { source?: "auto" | "demo"; clientId?: string } = {},
 ): Promise<GatedFeed> {
-  const { source = "auto" } = opts;
+  const { source = "auto", clientId } = opts;
 
   if (source === "auto" && hasSupabaseEnv) {
-    const { client, signals, currentPeriod } = await fetchLiveFeed();
+    const { client, signals, currentPeriod } = await fetchLiveFeed(clientId);
     const subscription: Subscription = {
       ...TIER_PRESETS[tier],
       current_period: currentPeriod,
