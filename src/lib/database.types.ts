@@ -27,6 +27,7 @@ export type SignalRow = {
   next_step: string | null;
   boost_flags: string[] | null;
   expansion_flag: boolean | null;
+  surfaced: boolean | null;
   initial_confidence: number; // int
   current_confidence: number; // int, live score after weekly decay
   decay_rate: number; // int, points/week. Gold=2, Silver=4, Bronze=6

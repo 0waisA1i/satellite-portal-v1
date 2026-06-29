@@ -20,5 +20,6 @@ export async function signOutAction() {
 
   cookieStore.delete("satellite_client_id");
   cookieStore.delete("satellite_user_id");
+  cookieStore.delete("satellite_user_email");
   redirect("/login");
 }

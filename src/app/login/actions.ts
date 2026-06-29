@@ -25,6 +25,23 @@ export async function loginAction(
     };
   }
 
+  const cookieStore = await cookies();
+  const cookieOpts = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax" as const,
+    path: "/",
+    maxAge: 60 * 60 * 24 * 7, // 7 days
+  };
+  // email is stored so the middleware can gate /admin without an async DB lookup.
+  cookieStore.set("satellite_user_id", authData.user.id, cookieOpts);
+  cookieStore.set("satellite_user_email", authData.user.email ?? "", cookieOpts);
+
+  // Admin bypasses the client lookup entirely and lands on /admin.
+  if (authData.user.email === "admin@satellite.com") {
+    redirect("/admin");
+  }
+
   // Look up which client this user belongs to.
   // user_clients schema: { user_id uuid FK auth.users, client_id text FK icp_configs.client_id }
   const { data: uc, error: ucError } = await supabase
@@ -39,17 +56,7 @@ export async function loginAction(
     };
   }
 
-  const cookieStore = await cookies();
-  const cookieOpts = {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax" as const,
-    path: "/",
-    maxAge: 60 * 60 * 24 * 7, // 7 days
-  };
   cookieStore.set("satellite_client_id", uc.client_id, cookieOpts);
-  // user_id is stored so signOutAction can call auth.admin.signOut on the server.
-  cookieStore.set("satellite_user_id", authData.user.id, cookieOpts);
 
   redirect("/");
 }
