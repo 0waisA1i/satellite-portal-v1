@@ -160,18 +160,21 @@ export default function DetailSheet({
                 <>
                   <Sec num="1" title="Signal intelligence">
                     <div className="text-[13.5px] leading-[1.6] text-txt-2">
-                      {signal.signal_intelligence}
+                      {signal.signal_intelligence || "—"}
                     </div>
                   </Sec>
-                  <Sec num="2" title="Summary">
-                    <div className="text-[13.5px] leading-[1.6] text-txt-2">
-                      {signal.summary}
-                    </div>
-                  </Sec>
+                  {signal.summary && signal.summary !== signal.signal_intelligence && (
+                    <Sec num="2" title="Summary">
+                      <div className="text-[13.5px] leading-[1.6] text-txt-2">
+                        {signal.summary}
+                      </div>
+                    </Sec>
+                  )}
                   <Sec num="3" title="Why now">
                     <div className="text-[13.5px] leading-[1.6]">
-                      {signal.why_now}, act within {signal.act_within_days}{" "}
-                      days.
+                      {signal.why_now
+                        ? `${signal.why_now}, act within ${signal.act_within_days} days.`
+                        : `Last confirmed ${signal.deadline_date}.`}
                     </div>
                   </Sec>
                   <Sec num="4" title="Suggested next step">
