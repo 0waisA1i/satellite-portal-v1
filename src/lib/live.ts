@@ -22,8 +22,8 @@ import type { ApproachWindowRow, SignalRow } from "./database.types";
 //   - no `accounts` entity                -> account.name = signals.company,
 //     sector/geo unknown (live only has them at the ICP level, not per signal)
 //   - no `outreach_angle` / `target_titles` -> parsed from `target_persona`
-//   - no `trigger_label` / `why_now` / `signal_intelligence` -> derived from
-//     summary + tier metadata
+//   - no `trigger_label` / `signal_intelligence` -> derived from summary + tier metadata
+//   - `why_now` and `outreach_angle` now read directly from the signals table
 //   - no `deadline_date` / `act_within_days` / `est_volume` -> deadline and
 //     act-window derived from the approach_windows view; est_volume unknown
 //   - no `source_verified`                -> defaults false (no verified badge)
@@ -77,12 +77,12 @@ function mapRow(row: SignalRow, window?: ApproachWindowRow): Signal {
     trigger_label: [row.archetype_tier, row.priority_tier]
       .filter(Boolean)
       .join(" · "),
-    why_now: summary ? firstSentence(summary) : "", // GAP: derived from summary
+    why_now: row.why_now ?? "",
     summary,
     signal_intelligence: summary, // GAP: no dedicated field; reuse summary
     suggested_next_step: sanitize(row.next_step),
     target_titles: parseTargetTitles(row.target_persona),
-    outreach_angle: "", // GAP: no outreach_angle column yet
+    outreach_angle: row.outreach_angle ?? "",
     false_positive_filter: "", // GAP: lives in icp_configs.config, not per signal
     rank_boost_flags: row.boost_flags ?? [],
     confidence_current: row.current_confidence,

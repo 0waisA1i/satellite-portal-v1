@@ -195,9 +195,18 @@ export default function DetailSheet({
                     {signal.contacts.map((c, i) => (
                       <ContactRow key={`${c.title}-${i}`} contact={c} />
                     ))}
-                    <div className="mt-[9px] text-[11px] leading-[1.4] text-txt-2">
-                      {signal.outreach_angle}
-                    </div>
+                    {signal.target_titles.length > 0 && (
+                      <div className="mt-[9px] flex flex-wrap gap-[6px]">
+                        {signal.target_titles.map((t) => (
+                          <span
+                            key={t}
+                            className="rounded-[7px] border border-line bg-white/5 px-[9px] py-[3px] text-[11px] font-medium"
+                          >
+                            {t}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                     {subscription.enrich_enabled ? (
                       <div className="mt-[12px]">
                         <button className={btnAccent} onClick={onOutreach}>
