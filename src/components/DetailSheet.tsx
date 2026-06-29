@@ -158,11 +158,13 @@ export default function DetailSheet({
             <div className="px-[26px] pb-[40px] pt-[8px]">
               {mode === "detail" ? (
                 <>
-                  <Sec num="1" title="Signal intelligence">
-                    <div className="text-[13.5px] leading-[1.6] text-txt-2">
-                      {signal.signal_intelligence || "—"}
-                    </div>
-                  </Sec>
+                  {signal.signal_intelligence && (
+                    <Sec num="1" title="Signal intelligence">
+                      <div className="text-[13.5px] leading-[1.6] text-txt-2">
+                        {signal.signal_intelligence}
+                      </div>
+                    </Sec>
+                  )}
                   {signal.summary && signal.summary !== signal.signal_intelligence && (
                     <Sec num="2" title="Summary">
                       <div className="text-[13.5px] leading-[1.6] text-txt-2">
@@ -170,13 +172,20 @@ export default function DetailSheet({
                       </div>
                     </Sec>
                   )}
-                  <Sec num="3" title="Why now">
-                    <div className="text-[13.5px] leading-[1.6]">
-                      {signal.why_now
-                        ? `${signal.why_now}, act within ${signal.act_within_days} days.`
-                        : `Last confirmed ${signal.deadline_date}.`}
-                    </div>
-                  </Sec>
+                  {signal.outreach_angle && (
+                    <Sec num="→" title="Outreach angle">
+                      <div className="text-[13.5px] leading-[1.6] text-txt-2">
+                        {signal.outreach_angle}
+                      </div>
+                    </Sec>
+                  )}
+                  {signal.why_now && (
+                    <Sec num="3" title="Why now">
+                      <div className="text-[13.5px] leading-[1.6]">
+                        {signal.why_now}, act within {signal.act_within_days} days.
+                      </div>
+                    </Sec>
+                  )}
                   <Sec num="4" title="Suggested next step">
                     <div className="text-[13.5px] leading-[1.6] text-txt-2">
                       {signal.suggested_next_step}
