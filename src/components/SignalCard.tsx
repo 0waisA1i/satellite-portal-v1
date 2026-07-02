@@ -187,12 +187,14 @@ export default function SignalCard({
             )}
           </div>
 
-          <div className="mt-[11px] flex items-baseline gap-[6px] text-[8.5px] leading-[1.4] text-txt-3">
-            <span className="shrink-0 text-[8px] font-bold uppercase tracking-[0.1em] text-alert">
-              Filtered out
-            </span>
-            <span>{signal.false_positive_filter}</span>
-          </div>
+          {signal.false_positive_filter && (
+            <div className="mt-[11px] flex items-baseline gap-[6px] text-[8.5px] leading-[1.4] text-txt-3">
+              <span className="shrink-0 text-[8px] font-bold uppercase tracking-[0.1em] text-alert">
+                Filtered out
+              </span>
+              <span>{signal.false_positive_filter}</span>
+            </div>
+          )}
         </div>
       </div>
     </div>
