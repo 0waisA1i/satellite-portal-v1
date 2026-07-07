@@ -18,7 +18,7 @@ export async function fetchContactsForSignal(
 ): Promise<EnrichedContact[]> {
   const supabase = getServerSupabase();
   const { data, error } = await supabase
-    .from("contacts")
+    .from("contacts" as any)
     .select("id, name, title, email, linkedin_url, is_primary")
     .eq("signal_id", signalUuid)
     .order("is_primary", { ascending: false });
