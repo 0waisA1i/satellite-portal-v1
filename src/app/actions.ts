@@ -23,7 +23,7 @@ export async function fetchContactsForSignal(
     .eq("signal_id", signalUuid)
     .order("is_primary", { ascending: false });
   if (error) throw new Error(`contacts fetch failed: ${error.message}`);
-  return (data ?? []) as EnrichedContact[];
+  return (data ?? []) as unknown as EnrichedContact[];
 }
 
 export async function signOutAction() {
