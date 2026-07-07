@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import type { GatedFeed, Tier } from "@/lib/types";
 import DemoBar from "@/components/DemoBar";
+import ExportCsvButton from "@/components/ExportCsvButton";
 import FeedClient from "@/components/FeedClient";
 import TopBar from "@/components/TopBar";
 import { ACCENT_HEX, formatPeriod } from "@/lib/archetypes";
@@ -85,6 +86,7 @@ export default function FeedView({
             Surfaced this period · {signals.length}
           </span>
           <span className="h-px flex-1 bg-line" />
+          <ExportCsvButton signals={signals} period={subscription.current_period} />
         </div>
 
         <FeedClient feed={feed} basePath={basePath} />

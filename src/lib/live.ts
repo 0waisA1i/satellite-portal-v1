@@ -65,6 +65,7 @@ function mapRow(row: SignalRow, window?: ApproachWindowRow): Signal {
     : 30; // GAP: no act-window source for signals without an approach_windows row
 
   return {
+    id: row.id,
     signal_id: row.signal_id,
     archetype: archetypeName,
     account: {

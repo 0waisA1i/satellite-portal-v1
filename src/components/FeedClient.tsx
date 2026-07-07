@@ -3,7 +3,9 @@
 import { useCallback, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { GatedFeed, Subscription, Tier, VisibleSignal } from "@/lib/types";
+import { archetypeAccent } from "@/lib/archetypes";
 import DetailSheet, { type SheetMode } from "./DetailSheet";
+import EnrichPanel from "./EnrichPanel";
 import SignalCard from "./SignalCard";
 import UpgradeBanner from "./UpgradeBanner";
 import { LockIcon } from "./icons";
@@ -14,6 +16,7 @@ import { LockIcon } from "./icons";
 // to read as credible.
 const PLACEHOLDER_SIGNALS: VisibleSignal[] = [
   {
+    id: "00000000-0000-0000-0000-000000000000",
     signal_id: "ph-0",
     archetype: "Regulatory Pressure",
     account: {
@@ -44,6 +47,7 @@ const PLACEHOLDER_SIGNALS: VisibleSignal[] = [
     contacts: [],
   },
   {
+    id: "00000000-0000-0000-0000-000000000001",
     signal_id: "ph-1",
     archetype: "CapEx Cycle",
     account: {
@@ -75,12 +79,53 @@ const PLACEHOLDER_SIGNALS: VisibleSignal[] = [
   },
 ];
 
+// Compact strip showing one chip per archetype with active signal count.
+// Kathairos-only: rendered above the signal list when client.id === "kathairos".
+function ArchetypeStrip({ signals }: { signals: VisibleSignal[] }) {
+  const counts: Record<string, number> = {};
+  for (const s of signals) {
+    if (s.status === "active") {
+      counts[s.archetype] = (counts[s.archetype] ?? 0) + 1;
+    }
+  }
+  const archetypes = Object.keys(counts);
+  if (archetypes.length === 0) return null;
+  return (
+    <div className="mb-[14px] flex flex-wrap gap-[8px]">
+      {archetypes.map((a) => {
+        const hex = archetypeAccent(a);
+        return (
+          <span
+            key={a}
+            className="inline-flex items-center gap-[8px] rounded-full border px-[12px] py-[5px] text-[10.5px] font-semibold"
+            style={{ color: hex, borderColor: `${hex}30`, background: `${hex}0d` }}
+          >
+            <span
+              className="inline-block h-[6px] w-[6px] shrink-0 rounded-full"
+              style={{ background: hex }}
+            />
+            {a}
+            <span
+              className="rounded-full px-[6px] py-[1px] text-[9.5px] font-bold"
+              style={{ background: `${hex}22`, color: hex }}
+            >
+              {counts[a]}
+            </span>
+          </span>
+        );
+      })}
+    </div>
+  );
+}
+
 function LockedCard({
   signal,
   subscription,
+  hideVolume,
 }: {
   signal: VisibleSignal;
   subscription: Subscription;
+  hideVolume: boolean;
 }) {
   return (
     <div className="relative overflow-hidden rounded-[14px] border border-line/50">
@@ -89,6 +134,7 @@ function LockedCard({
         <SignalCard
           signal={signal}
           subscription={subscription}
+          hideVolume={hideVolume}
           onDetail={() => {}}
           onEnrich={() => {}}
           onOutreach={() => {}}
@@ -138,6 +184,7 @@ export default function FeedClient({
     signal: VisibleSignal;
     mode: SheetMode;
   } | null>(null);
+  const [enrichSignal, setEnrichSignal] = useState<VisibleSignal | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -153,6 +200,7 @@ export default function FeedClient({
   };
 
   const { tier } = feed.subscription;
+  const isKathairos = feed.client.id === "kathairos";
 
   // Always exactly 1 teaser card; fall back to a placeholder if real teasers
   // run out (e.g. Stack tier where all signals fit within the cap).
@@ -161,18 +209,19 @@ export default function FeedClient({
 
   return (
     <>
+      {isKathairos && <ArchetypeStrip signals={feed.signals} />}
+
       <div className="flex flex-col gap-[14px]">
         {feed.signals.map((s) => (
           <SignalCard
             key={s.signal_id}
             signal={s}
             subscription={feed.subscription}
+            hideVolume={isKathairos}
             onDetail={() => setSheet({ signal: s, mode: "detail" })}
-            onEnrich={() => showToast("Enrichment runs in a later version")}
+            onEnrich={() => setEnrichSignal(s)}
             onOutreach={() => setSheet({ signal: s, mode: "outreach" })}
-            onCrm={() =>
-              showToast(`Pushed "${s.account.name}" to your CRM as a task`)
-            }
+            onCrm={() => showToast("CRM push runs in later version")}
           />
         ))}
       </div>
@@ -183,11 +232,17 @@ export default function FeedClient({
             <LockedCard
               signal={teaserSignal}
               subscription={feed.subscription}
+              hideVolume={isKathairos}
             />
           </div>
           <UpgradeBanner tier={tier} onUpgrade={upgrade} />
         </>
       )}
+
+      <EnrichPanel
+        signal={enrichSignal}
+        onClose={() => setEnrichSignal(null)}
+      />
 
       <DetailSheet
         signal={sheet?.signal ?? null}

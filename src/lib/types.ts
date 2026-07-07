@@ -37,7 +37,8 @@ export interface Account {
 }
 
 export interface Signal {
-  signal_id: string;
+  id: string;        // uuid PK from signals.id — used for FK lookups (e.g. contacts)
+  signal_id: string; // human-readable text code e.g. "KAT-001"
   archetype: string;
   account: Account;
   title: string;
