@@ -219,7 +219,11 @@ export default function FeedClient({
             subscription={feed.subscription}
             hideVolume={isKathairos}
             onDetail={() => setSheet({ signal: s, mode: "detail" })}
-            onEnrich={() => setEnrichSignal(s)}
+            onEnrich={() =>
+              isKathairos
+                ? showToast("Enrichment runs in a later version")
+                : setEnrichSignal(s)
+            }
             onOutreach={() => setSheet({ signal: s, mode: "outreach" })}
             onCrm={() => showToast("CRM push runs in later version")}
           />
