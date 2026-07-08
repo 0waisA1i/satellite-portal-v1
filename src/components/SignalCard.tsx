@@ -189,7 +189,7 @@ export default function SignalCard({
                 onClick={onArchive}
               >
                 <ArchiveIcon />
-                Archive
+                Mark as complete
               </button>
             )}
             {onRestore && (
