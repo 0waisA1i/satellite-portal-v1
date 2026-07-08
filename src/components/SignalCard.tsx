@@ -3,7 +3,7 @@ import { archetypeAccent, formatDeadline } from "@/lib/archetypes";
 import ActPill from "./ActPill";
 import ArchetypeRail from "./ArchetypeRail";
 import ContactRow from "./ContactRow";
-import { ArchiveIcon, CrmIcon, InfoIcon, LockIcon, PenIcon, SparkIcon } from "./icons";
+import { ArchiveIcon, CrmIcon, InfoIcon, LockIcon, PenIcon, RestoreIcon, SparkIcon } from "./icons";
 
 const btn =
   "inline-flex items-center gap-[7px] rounded-[9px] px-[15px] py-[9px] text-[12px] font-semibold transition";
@@ -59,6 +59,7 @@ export default function SignalCard({
   onOutreach,
   onCrm,
   onArchive,
+  onRestore,
 }: {
   signal: VisibleSignal;
   subscription: Subscription;
@@ -68,6 +69,7 @@ export default function SignalCard({
   onOutreach: () => void;
   onCrm: () => void;
   onArchive?: () => void;
+  onRestore?: () => void;
 }) {
   const accent = archetypeAccent(signal.archetype);
   const anyEnriched = subscription.enrich_enabled;
@@ -188,6 +190,15 @@ export default function SignalCard({
               >
                 <ArchiveIcon />
                 Archive
+              </button>
+            )}
+            {onRestore && (
+              <button
+                className={`${btnGhost} ml-auto text-txt-3 hover:border-accent/40 hover:text-accent`}
+                onClick={onRestore}
+              >
+                <RestoreIcon />
+                Restore
               </button>
             )}
             {signal.source_verified && (

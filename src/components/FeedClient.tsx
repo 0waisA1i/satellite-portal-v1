@@ -4,7 +4,7 @@ import { useCallback, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { GatedFeed, Subscription, Tier, VisibleSignal } from "@/lib/types";
 import { archetypeAccent } from "@/lib/archetypes";
-import { archiveSignalAction } from "@/app/actions";
+import { archiveSignalAction, restoreSignalAction } from "@/app/actions";
 import DetailSheet, { type SheetMode } from "./DetailSheet";
 import EnrichPanel from "./EnrichPanel";
 import SignalCard from "./SignalCard";
@@ -235,6 +235,14 @@ export default function FeedClient({
               isH2o && !isHistorical
                 ? async () => {
                     await archiveSignalAction(s.id);
+                    router.refresh();
+                  }
+                : undefined
+            }
+            onRestore={
+              isH2o && isHistorical
+                ? async () => {
+                    await restoreSignalAction(s.id);
                     router.refresh();
                   }
                 : undefined

@@ -47,3 +47,10 @@ export const ArchiveIcon = () => (
     <path d="M10 12h4" />
   </svg>
 );
+
+export const RestoreIcon = () => (
+  <svg {...base}>
+    <path d="M3 12a9 9 0 1 0 2.6-6.36L3 8" />
+    <path d="M3 3v5h5" />
+  </svg>
+);
