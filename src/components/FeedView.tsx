@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import Link from "next/link";
 import type { GatedFeed, Tier } from "@/lib/types";
 import DemoBar from "@/components/DemoBar";
 import ExportCsvButton from "@/components/ExportCsvButton";
@@ -13,15 +14,19 @@ import { ACCENT_HEX, formatPeriod } from "@/lib/archetypes";
 export default function FeedView({
   feed,
   tier,
+  view = "feed",
   basePath,
   isDemo = false,
 }: {
   feed: GatedFeed;
   tier: Tier;
+  view?: "feed" | "historical";
   basePath: string;
   isDemo?: boolean;
 }) {
   const { client, subscription, signals, stats } = feed;
+  const isH2o = client.id === "h2oallegiant";
+  const isHistorical = view === "historical";
 
   return (
     <div
@@ -30,6 +35,27 @@ export default function FeedView({
     >
       <TopBar client={client} tier={tier} />
       <DemoBar tier={tier} basePath={basePath} />
+      {isH2o && (
+        <div className="flex items-center justify-center gap-[14px] border-b border-line bg-white/[0.02] px-[26px] py-[9px]">
+          <span className="text-[9.5px] font-bold uppercase tracking-[0.16em] text-txt-3">
+            View
+          </span>
+          <div className="flex gap-[2px] rounded-[10px] border border-line bg-panel p-[3px]">
+            <Link
+              href={`${basePath}?tier=${tier}`}
+              className={`rounded-[7px] px-[16px] py-[6px] text-[12px] font-semibold transition ${!isHistorical ? "bg-accent text-black" : "text-txt-3"}`}
+            >
+              Active
+            </Link>
+            <Link
+              href={`${basePath}?tier=${tier}&view=historical`}
+              className={`rounded-[7px] px-[16px] py-[6px] text-[12px] font-semibold transition ${isHistorical ? "bg-accent text-black" : "text-txt-3"}`}
+            >
+              Historical
+            </Link>
+          </div>
+        </div>
+      )}
 
       <div className="mx-auto max-w-[1180px] px-[26px] pb-[90px] pt-[30px]">
         <div className="mb-[8px] flex items-end justify-between gap-[24px] max-md:flex-col max-md:items-start">
@@ -83,13 +109,15 @@ export default function FeedView({
 
         <div className="mb-[16px] mt-[24px] flex items-center gap-[10px]">
           <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-txt-3">
-            Surfaced this period · {signals.length}
+            {isHistorical ? `Historical signals · ${signals.length}` : `Surfaced this period · ${signals.length}`}
           </span>
           <span className="h-px flex-1 bg-line" />
-          <ExportCsvButton signals={signals} period={subscription.current_period} />
+          {!isHistorical && (
+            <ExportCsvButton signals={signals} period={subscription.current_period} />
+          )}
         </div>
 
-        <FeedClient feed={feed} basePath={basePath} />
+        <FeedClient feed={feed} view={view} basePath={basePath} />
       </div>
     </div>
   );

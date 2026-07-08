@@ -119,6 +119,65 @@ function gate(
   };
 }
 
+// Historical view: all expired signals for the client, no cap, no teaser.
+// "Archived" signals are stored as expired in the current schema (the DB check
+// constraint only allows active/stale/expired; 'archived' requires a migration).
+function gateHistorical(
+  client: Client,
+  allSignals: Signal[],
+  subscription: Subscription,
+): GatedFeed {
+  const historical = allSignals
+    .filter((s) => s.status === "expired")
+    .sort((a, b) => b.confidence_current - a.confidence_current);
+
+  const signals: VisibleSignal[] = historical.map(
+    ({ contacts: _c, ...rest }) => ({ ...rest, contacts: [] }),
+  );
+
+  return {
+    client,
+    subscription,
+    signals,
+    teaserSignals: [],
+    stats: {
+      total: historical.length,
+      active: 0,
+      avgConfidence: Math.round(
+        historical.reduce((a, s) => a + s.confidence_current, 0) /
+          Math.max(historical.length, 1),
+      ),
+    },
+  };
+}
+
+export async function getHistoricalFeed(
+  tier: Tier,
+  opts: { clientId?: string } = {},
+): Promise<GatedFeed> {
+  const { clientId } = opts;
+
+  if (hasSupabaseEnv && clientId) {
+    const { client, signals, currentPeriod } = await fetchLiveFeed(clientId);
+    const subscription: Subscription = {
+      ...TIER_PRESETS[tier],
+      current_period: currentPeriod,
+    };
+    return gateHistorical(client, signals, subscription);
+  }
+
+  const data = sample as unknown as {
+    client: Client;
+    subscription: Subscription;
+    signals: Signal[];
+  };
+  const subscription: Subscription = {
+    ...TIER_PRESETS[tier],
+    current_period: data.subscription.current_period,
+  };
+  return gateHistorical(data.client, data.signals, subscription);
+}
+
 // Reads from live Supabase when env is configured, otherwise the sample JSON.
 // `source` forces the choice: "demo" always uses the bundled sample (so the
 // /demo route works on Vercel even with live env set); "auto" prefers live and

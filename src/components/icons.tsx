@@ -39,3 +39,11 @@ export const CrmIcon = () => (
     <path d="M3 12a9 3 0 0 0 18 0" />
   </svg>
 );
+
+export const ArchiveIcon = () => (
+  <svg {...base}>
+    <path d="M21 8V21H3V8" />
+    <path d="M23 3H1v5h22V3z" />
+    <path d="M10 12h4" />
+  </svg>
+);

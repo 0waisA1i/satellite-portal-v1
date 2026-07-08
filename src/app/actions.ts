@@ -26,6 +26,23 @@ export async function fetchContactsForSignal(
   return (data ?? []) as unknown as EnrichedContact[];
 }
 
+// Archives a signal by setting its status to 'expired' (the closest supported
+// DB value; 'archived' requires a migration to add to the check constraint).
+// Gated to h2oallegiant client only — verified server-side from the cookie.
+export async function archiveSignalAction(signalId: string): Promise<void> {
+  const cookieStore = await cookies();
+  const clientId = cookieStore.get("satellite_client_id")?.value;
+  if (clientId !== "h2oallegiant") return;
+
+  const supabase = getServerSupabase();
+  const { error } = await supabase
+    .from("signals")
+    .update({ status: "expired" })
+    .eq("signal_id", signalId)
+    .eq("client_id", clientId);
+  if (error) throw new Error(`archive failed: ${error.message}`);
+}
+
 export async function signOutAction() {
   const cookieStore = await cookies();
   const userId = cookieStore.get("satellite_user_id")?.value;

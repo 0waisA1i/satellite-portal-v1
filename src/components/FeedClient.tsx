@@ -4,6 +4,7 @@ import { useCallback, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { GatedFeed, Subscription, Tier, VisibleSignal } from "@/lib/types";
 import { archetypeAccent } from "@/lib/archetypes";
+import { archiveSignalAction } from "@/app/actions";
 import DetailSheet, { type SheetMode } from "./DetailSheet";
 import EnrichPanel from "./EnrichPanel";
 import SignalCard from "./SignalCard";
@@ -174,9 +175,11 @@ function LockedCard({
 
 export default function FeedClient({
   feed,
+  view = "feed",
   basePath = "/",
 }: {
   feed: GatedFeed;
+  view?: "feed" | "historical";
   basePath?: string;
 }) {
   const router = useRouter();
@@ -201,6 +204,8 @@ export default function FeedClient({
 
   const { tier } = feed.subscription;
   const isKathairos = feed.client.id === "kathairos";
+  const isH2o = feed.client.id === "h2oallegiant";
+  const isHistorical = view === "historical";
 
   // Always exactly 1 teaser card; fall back to a placeholder if real teasers
   // run out (e.g. Stack tier where all signals fit within the cap).
@@ -226,11 +231,19 @@ export default function FeedClient({
             }
             onOutreach={() => setSheet({ signal: s, mode: "outreach" })}
             onCrm={() => showToast("CRM push runs in later version")}
+            onArchive={
+              isH2o && !isHistorical
+                ? async () => {
+                    await archiveSignalAction(s.signal_id);
+                    router.refresh();
+                  }
+                : undefined
+            }
           />
         ))}
       </div>
 
-      {tier !== "command" && (
+      {tier !== "command" && !isHistorical && (
         <>
           <div className="mt-[14px]">
             <LockedCard

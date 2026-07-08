@@ -3,7 +3,7 @@ import { archetypeAccent, formatDeadline } from "@/lib/archetypes";
 import ActPill from "./ActPill";
 import ArchetypeRail from "./ArchetypeRail";
 import ContactRow from "./ContactRow";
-import { CrmIcon, InfoIcon, LockIcon, PenIcon, SparkIcon } from "./icons";
+import { ArchiveIcon, CrmIcon, InfoIcon, LockIcon, PenIcon, SparkIcon } from "./icons";
 
 const btn =
   "inline-flex items-center gap-[7px] rounded-[9px] px-[15px] py-[9px] text-[12px] font-semibold transition";
@@ -58,6 +58,7 @@ export default function SignalCard({
   onEnrich,
   onOutreach,
   onCrm,
+  onArchive,
 }: {
   signal: VisibleSignal;
   subscription: Subscription;
@@ -66,6 +67,7 @@ export default function SignalCard({
   onEnrich: () => void;
   onOutreach: () => void;
   onCrm: () => void;
+  onArchive?: () => void;
 }) {
   const accent = archetypeAccent(signal.archetype);
   const anyEnriched = subscription.enrich_enabled;
@@ -179,6 +181,15 @@ export default function SignalCard({
               unlockLabel="Signal Command"
               onClick={onCrm}
             />
+            {onArchive && (
+              <button
+                className={`${btnGhost} ml-auto text-txt-3 hover:border-alert/40 hover:text-alert`}
+                onClick={onArchive}
+              >
+                <ArchiveIcon />
+                Archive
+              </button>
+            )}
             {signal.source_verified && (
               <a
                 className="ml-auto whitespace-nowrap text-[9px] tracking-[0.03em] text-accent before:font-bold before:tracking-[0.1em] before:text-txt-4 before:content-['SOURCE_→_']"

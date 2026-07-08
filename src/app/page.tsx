@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import FeedView from "@/components/FeedView";
-import { getGatedFeed, isTier } from "@/lib/feed";
+import { getGatedFeed, getHistoricalFeed, isTier } from "@/lib/feed";
 
 // Live feed: reads Supabase for the logged-in client.
 // Auth is enforced by middleware (redirects to /login if no satellite_client_id cookie).
@@ -9,7 +9,7 @@ import { getGatedFeed, isTier } from "@/lib/feed";
 export default async function FeedPage({
   searchParams,
 }: {
-  searchParams: Promise<{ tier?: string }>;
+  searchParams: Promise<{ tier?: string; view?: string }>;
 }) {
   const [params, cookieStore] = await Promise.all([
     searchParams,
@@ -20,7 +20,18 @@ export default async function FeedPage({
   if (!clientId) redirect("/login");
 
   const tier = isTier(params.tier) ? params.tier : "command";
-  const feed = await getGatedFeed(tier, { clientId });
+  const isHistorical = params.view === "historical" && clientId === "h2oallegiant";
 
-  return <FeedView feed={feed} tier={tier} basePath="/" />;
+  const feed = isHistorical
+    ? await getHistoricalFeed(tier, { clientId })
+    : await getGatedFeed(tier, { clientId });
+
+  return (
+    <FeedView
+      feed={feed}
+      tier={tier}
+      view={isHistorical ? "historical" : "feed"}
+      basePath="/"
+    />
+  );
 }
