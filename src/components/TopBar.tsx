@@ -49,7 +49,8 @@ export default function TopBar({
         </div>
       </div>
       <div className="flex items-center gap-[12px]">
-        <span className="rounded-full border border-line bg-panel px-[10px] py-[5px] text-[9.5px] font-semibold uppercase tracking-[0.08em] text-txt-3">
+        <span className="inline-flex items-center gap-[7px] rounded-full border border-accent/25 bg-accent/10 px-[13px] py-[6px] text-[11px] font-bold uppercase tracking-[0.06em] text-accent">
+          <span className="h-[6px] w-[6px] rounded-full bg-accent shadow-[0_0_8px_var(--accent)]" />
           {PLAN_LABELS[subscriptionTier]}
         </span>
         <AvatarMenu code={client.code} />
