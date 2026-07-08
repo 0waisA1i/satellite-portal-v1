@@ -234,7 +234,7 @@ export default function FeedClient({
             onArchive={
               isH2o && !isHistorical
                 ? async () => {
-                    await archiveSignalAction(s.signal_id);
+                    await archiveSignalAction(s.id);
                     router.refresh();
                   }
                 : undefined

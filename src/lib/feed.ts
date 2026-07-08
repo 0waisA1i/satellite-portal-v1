@@ -88,7 +88,8 @@ function gate(
       (s) =>
         s.surfaced &&
         s.surfaced_period === subscription.current_period &&
-        s.status !== "expired",
+        s.status !== "expired" &&
+        s.status !== "archived",
     )
     .sort((a, b) => b.confidence_current - a.confidence_current);
 
@@ -128,7 +129,7 @@ function gateHistorical(
   subscription: Subscription,
 ): GatedFeed {
   const historical = allSignals
-    .filter((s) => s.status === "expired")
+    .filter((s) => s.status === "expired" || s.status === "archived")
     .sort((a, b) => b.confidence_current - a.confidence_current);
 
   const signals: VisibleSignal[] = historical.map(

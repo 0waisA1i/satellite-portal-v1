@@ -26,10 +26,9 @@ export async function fetchContactsForSignal(
   return (data ?? []) as unknown as EnrichedContact[];
 }
 
-// Archives a signal by setting its status to 'expired' (the closest supported
-// DB value; 'archived' requires a migration to add to the check constraint).
-// Gated to h2oallegiant client only — verified server-side from the cookie.
-export async function archiveSignalAction(signalId: string): Promise<void> {
+// Archives a signal using its uuid PK. Gated to h2oallegiant via cookie.
+// Uses the service role client so RLS does not block the update.
+export async function archiveSignalAction(signalUuid: string): Promise<void> {
   const cookieStore = await cookies();
   const clientId = cookieStore.get("satellite_client_id")?.value;
   if (clientId !== "h2oallegiant") return;
@@ -37,8 +36,8 @@ export async function archiveSignalAction(signalId: string): Promise<void> {
   const supabase = getServerSupabase();
   const { error } = await supabase
     .from("signals")
-    .update({ status: "expired" })
-    .eq("signal_id", signalId)
+    .update({ status: "archived" })
+    .eq("id", signalUuid)
     .eq("client_id", clientId);
   if (error) throw new Error(`archive failed: ${error.message}`);
 }

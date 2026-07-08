@@ -55,7 +55,7 @@ export interface Signal {
   deadline_date: string;
   act_within_days: number;
   est_volume: string;
-  status: "active" | "stale" | "expired";
+  status: "active" | "stale" | "expired" | "archived";
   source_url: string;
   source_verified: boolean;
   surfaced: boolean;
