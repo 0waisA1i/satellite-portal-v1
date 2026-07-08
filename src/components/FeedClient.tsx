@@ -190,6 +190,20 @@ export default function FeedClient({
   const [enrichSignal, setEnrichSignal] = useState<VisibleSignal | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [exitingIds, setExitingIds] = useState<Set<string>>(new Set());
+  const [exitDirs, setExitDirs] = useState<Record<string, "up" | "down">>({});
+
+  // Returns an async handler that plays an exit animation before running the action.
+  const triggerExit = useCallback(
+    (signalId: string, dir: "up" | "down", action: () => Promise<void>) =>
+      async () => {
+        setExitingIds((prev) => new Set([...prev, signalId]));
+        setExitDirs((prev) => ({ ...prev, [signalId]: dir }));
+        await new Promise<void>((r) => setTimeout(r, 260));
+        await action();
+      },
+    [],
+  );
 
   const showToast = useCallback((msg: string) => {
     if (toastTimer.current) clearTimeout(toastTimer.current);
@@ -217,38 +231,52 @@ export default function FeedClient({
       {isKathairos && <ArchetypeStrip signals={feed.signals} />}
 
       <div className="flex flex-col gap-[14px]">
-        {feed.signals.map((s) => (
-          <SignalCard
-            key={s.signal_id}
-            signal={s}
-            subscription={feed.subscription}
-            hideVolume={isKathairos}
-            onDetail={() => setSheet({ signal: s, mode: "detail" })}
-            onEnrich={() =>
-              isKathairos
-                ? showToast("Enrichment runs in a later version")
-                : setEnrichSignal(s)
-            }
-            onOutreach={() => setSheet({ signal: s, mode: "outreach" })}
-            onCrm={() => showToast("CRM push runs in later version")}
-            onArchive={
-              isH2o && !isHistorical
-                ? async () => {
-                    await archiveSignalAction(s.id);
-                    router.refresh();
-                  }
-                : undefined
-            }
-            onRestore={
-              isH2o && isHistorical
-                ? async () => {
-                    await restoreSignalAction(s.id);
-                    router.refresh();
-                  }
-                : undefined
-            }
-          />
-        ))}
+        {feed.signals.map((s) => {
+          const exiting = exitingIds.has(s.signal_id);
+          const dir = exitDirs[s.signal_id] ?? "up";
+          return (
+            <div
+              key={s.signal_id}
+              style={{
+                opacity: exiting ? 0 : 1,
+                transform: exiting
+                  ? `translateY(${dir === "up" ? "-10px" : "10px"})`
+                  : "translateY(0)",
+                transition: "opacity 0.25s ease, transform 0.25s ease",
+              }}
+            >
+              <SignalCard
+                signal={s}
+                subscription={feed.subscription}
+                hideVolume={isKathairos}
+                onDetail={() => setSheet({ signal: s, mode: "detail" })}
+                onEnrich={() =>
+                  isKathairos
+                    ? showToast("Enrichment runs in a later version")
+                    : setEnrichSignal(s)
+                }
+                onOutreach={() => setSheet({ signal: s, mode: "outreach" })}
+                onCrm={() => showToast("CRM push runs in later version")}
+                onArchive={
+                  isH2o && !isHistorical
+                    ? triggerExit(s.signal_id, "up", async () => {
+                        await archiveSignalAction(s.id);
+                        router.refresh();
+                      })
+                    : undefined
+                }
+                onRestore={
+                  isH2o && isHistorical
+                    ? triggerExit(s.signal_id, "down", async () => {
+                        await restoreSignalAction(s.id);
+                        router.refresh();
+                      })
+                    : undefined
+                }
+              />
+            </div>
+          );
+        })}
       </div>
 
       {tier !== "command" && !isHistorical && (
