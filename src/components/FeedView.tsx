@@ -14,12 +14,14 @@ import { ACCENT_HEX, formatPeriod } from "@/lib/archetypes";
 export default function FeedView({
   feed,
   tier,
+  subscriptionTier,
   view = "feed",
   basePath,
   isDemo = false,
 }: {
   feed: GatedFeed;
   tier: Tier;
+  subscriptionTier?: Tier; // real DB tier; falls back to tier (e.g. on /demo)
   view?: "feed" | "historical";
   basePath: string;
   isDemo?: boolean;
@@ -27,13 +29,14 @@ export default function FeedView({
   const { client, subscription, signals, stats } = feed;
   const isH2o = client.id === "h2oallegiant";
   const isHistorical = view === "historical";
+  const planTier = subscriptionTier ?? tier;
 
   return (
     <div
       className="min-h-screen"
       style={{ "--accent": ACCENT_HEX[client.accent] } as CSSProperties}
     >
-      <TopBar client={client} tier={tier} />
+      <TopBar client={client} subscriptionTier={planTier} />
       {isH2o ? (
         <div className="flex items-center justify-center gap-[14px] border-b border-line bg-white/[0.02] px-[26px] py-[9px]">
           <div className="flex gap-[2px] rounded-[10px] border border-line bg-panel p-[3px]">

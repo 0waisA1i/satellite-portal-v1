@@ -22,10 +22,11 @@ export default async function FeedPage({
 
   const isH2o = clientId === "h2oallegiant";
 
-  // h2oallegiant uses their real subscription tier from the DB; other clients
-  // use the demo tier toggle from the URL param.
+  // Real subscription tier from DB — used for TopBar badge on all clients.
+  // h2oallegiant also uses it for gating; other clients use the demo URL toggle.
+  const subscriptionTier = await fetchClientTier(clientId);
   const tier = isH2o
-    ? await fetchClientTier(clientId)
+    ? subscriptionTier
     : (isTier(params.tier) ? params.tier : "command");
 
   const isHistorical = params.view === "historical" && isH2o;
@@ -38,6 +39,7 @@ export default async function FeedPage({
     <FeedView
       feed={feed}
       tier={tier}
+      subscriptionTier={subscriptionTier}
       view={isHistorical ? "historical" : "feed"}
       basePath="/"
     />

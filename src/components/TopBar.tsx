@@ -24,7 +24,13 @@ function Logo() {
   );
 }
 
-export default function TopBar({ client, tier }: { client: Client; tier: Tier }) {
+export default function TopBar({
+  client,
+  subscriptionTier,
+}: {
+  client: Client;
+  subscriptionTier: Tier;
+}) {
   return (
     <div className="sticky top-0 z-40 flex h-[58px] items-center justify-between border-b border-line bg-black/80 px-[26px] backdrop-blur-[14px]">
       <div className="flex items-center gap-[16px]">
@@ -43,12 +49,8 @@ export default function TopBar({ client, tier }: { client: Client; tier: Tier })
         </div>
       </div>
       <div className="flex items-center gap-[12px]">
-        <span className="inline-flex items-center gap-[7px] rounded-full border border-accent/25 bg-accent/10 px-[13px] py-[6px] text-[11px] font-bold uppercase tracking-[0.06em] text-accent">
-          <span className="h-[6px] w-[6px] rounded-full bg-accent shadow-[0_0_8px_var(--accent)]" />
-          Signal Satellite
-        </span>
         <span className="rounded-full border border-line bg-panel px-[10px] py-[5px] text-[9.5px] font-semibold uppercase tracking-[0.08em] text-txt-3">
-          {PLAN_LABELS[tier]} plan
+          {PLAN_LABELS[subscriptionTier]}
         </span>
         <AvatarMenu code={client.code} />
       </div>
