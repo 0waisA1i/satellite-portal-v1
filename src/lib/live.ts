@@ -1,7 +1,7 @@
 import "server-only";
 import { getServerSupabase } from "./supabase";
 import { archetypeLabel } from "./archetypes";
-import type { Client, Signal } from "./types";
+import type { Client, Signal, Tier } from "./types";
 import type { ApproachWindowRow, SignalRow } from "./database.types";
 
 // Live read layer: pulls rows from the introspected Supabase schema and maps
@@ -98,6 +98,22 @@ function mapRow(row: SignalRow, window?: ApproachWindowRow): Signal {
     surfaced_period: "", // set by caller to the current period
     contacts: [], // GAP: no contacts table; enrichment not wired
   };
+}
+
+// Reads the client's real subscription tier from the subscriptions table.
+// DB stores "signal_feed" | "signal_stack" | "signal_command"; maps to app Tier.
+// Falls back to "command" (no cap) if the row is missing.
+export async function fetchClientTier(clientId: string): Promise<Tier> {
+  const supabase = getServerSupabase();
+  const { data } = await (supabase as any)
+    .from("subscriptions")
+    .select("tier")
+    .eq("client_id", clientId)
+    .maybeSingle();
+  const t: string = data?.tier ?? "";
+  if (t === "signal_feed") return "feed";
+  if (t === "signal_stack") return "stack";
+  return "command";
 }
 
 export interface LiveFeed {

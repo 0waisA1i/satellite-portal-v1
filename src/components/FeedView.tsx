@@ -34,27 +34,25 @@ export default function FeedView({
       style={{ "--accent": ACCENT_HEX[client.accent] } as CSSProperties}
     >
       <TopBar client={client} tier={tier} />
-      <DemoBar tier={tier} basePath={basePath} />
-      {isH2o && (
+      {isH2o ? (
         <div className="flex items-center justify-center gap-[14px] border-b border-line bg-white/[0.02] px-[26px] py-[9px]">
-          <span className="text-[9.5px] font-bold uppercase tracking-[0.16em] text-txt-3">
-            View
-          </span>
           <div className="flex gap-[2px] rounded-[10px] border border-line bg-panel p-[3px]">
             <Link
-              href={`${basePath}?tier=${tier}`}
+              href={basePath}
               className={`rounded-[7px] px-[16px] py-[6px] text-[12px] font-semibold transition ${!isHistorical ? "bg-accent text-black" : "text-txt-3"}`}
             >
               Active
             </Link>
             <Link
-              href={`${basePath}?tier=${tier}&view=historical`}
+              href={`${basePath}?view=historical`}
               className={`rounded-[7px] px-[16px] py-[6px] text-[12px] font-semibold transition ${isHistorical ? "bg-accent text-black" : "text-txt-3"}`}
             >
               Historical
             </Link>
           </div>
         </div>
+      ) : (
+        <DemoBar tier={tier} basePath={basePath} />
       )}
 
       <div className="mx-auto max-w-[1180px] px-[26px] pb-[90px] pt-[30px]">

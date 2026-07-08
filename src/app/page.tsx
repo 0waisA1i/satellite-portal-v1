@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import FeedView from "@/components/FeedView";
 import { getGatedFeed, getHistoricalFeed, isTier } from "@/lib/feed";
+import { fetchClientTier } from "@/lib/live";
 
 // Live feed: reads Supabase for the logged-in client.
 // Auth is enforced by middleware (redirects to /login if no satellite_client_id cookie).
@@ -19,8 +20,15 @@ export default async function FeedPage({
   const clientId = cookieStore.get("satellite_client_id")?.value;
   if (!clientId) redirect("/login");
 
-  const tier = isTier(params.tier) ? params.tier : "command";
-  const isHistorical = params.view === "historical" && clientId === "h2oallegiant";
+  const isH2o = clientId === "h2oallegiant";
+
+  // h2oallegiant uses their real subscription tier from the DB; other clients
+  // use the demo tier toggle from the URL param.
+  const tier = isH2o
+    ? await fetchClientTier(clientId)
+    : (isTier(params.tier) ? params.tier : "command");
+
+  const isHistorical = params.view === "historical" && isH2o;
 
   const feed = isHistorical
     ? await getHistoricalFeed(tier, { clientId })
