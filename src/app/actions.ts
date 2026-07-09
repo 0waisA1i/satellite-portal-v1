@@ -26,11 +26,11 @@ export async function fetchContactsForSignal(
   return (data ?? []) as unknown as EnrichedContact[];
 }
 
-// Restores an archived/expired signal back to active. Gated to h2oallegiant.
+// Restores an archived/expired signal back to active. Gated to tab-view clients.
 export async function restoreSignalAction(signalUuid: string): Promise<void> {
   const cookieStore = await cookies();
   const clientId = cookieStore.get("satellite_client_id")?.value;
-  if (clientId !== "h2oallegiant") return;
+  if (clientId !== "h2oallegiant" && clientId !== "gridvest") return;
 
   const supabase = getServerSupabase();
   const { error } = await supabase
@@ -41,12 +41,12 @@ export async function restoreSignalAction(signalUuid: string): Promise<void> {
   if (error) throw new Error(`restore failed: ${error.message}`);
 }
 
-// Archives a signal using its uuid PK. Gated to h2oallegiant via cookie.
+// Archives a signal using its uuid PK. Gated to tab-view clients via cookie.
 // Uses the service role client so RLS does not block the update.
 export async function archiveSignalAction(signalUuid: string): Promise<void> {
   const cookieStore = await cookies();
   const clientId = cookieStore.get("satellite_client_id")?.value;
-  if (clientId !== "h2oallegiant") return;
+  if (clientId !== "h2oallegiant" && clientId !== "gridvest") return;
 
   const supabase = getServerSupabase();
   const { error } = await supabase

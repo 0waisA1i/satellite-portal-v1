@@ -218,7 +218,8 @@ export default function FeedClient({
 
   const { tier } = feed.subscription;
   const isKathairos = feed.client.id === "kathairos";
-  const isH2o = feed.client.id === "h2oallegiant";
+  const isGridvest = feed.client.id === "gridvest";
+  const usesTabView = feed.client.id === "h2oallegiant" || isGridvest;
   const isHistorical = view === "historical";
 
   // Always exactly 1 teaser card; fall back to a placeholder if real teasers
@@ -228,7 +229,7 @@ export default function FeedClient({
 
   return (
     <>
-      {isKathairos && <ArchetypeStrip signals={feed.signals} />}
+      {(isKathairos || isGridvest) && <ArchetypeStrip signals={feed.signals} />}
 
       <div className="flex flex-col gap-[14px]">
         {feed.signals.map((s) => {
@@ -258,7 +259,7 @@ export default function FeedClient({
                 onOutreach={() => setSheet({ signal: s, mode: "outreach" })}
                 onCrm={() => showToast("CRM push runs in later version")}
                 onArchive={
-                  isH2o && !isHistorical
+                  usesTabView && !isHistorical
                     ? triggerExit(s.signal_id, "up", async () => {
                         await archiveSignalAction(s.id);
                         router.refresh();
@@ -266,7 +267,7 @@ export default function FeedClient({
                     : undefined
                 }
                 onRestore={
-                  isH2o && isHistorical
+                  usesTabView && isHistorical
                     ? triggerExit(s.signal_id, "down", async () => {
                         await restoreSignalAction(s.id);
                         router.refresh();

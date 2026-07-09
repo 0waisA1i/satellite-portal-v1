@@ -20,16 +20,18 @@ export default async function FeedPage({
   const clientId = cookieStore.get("satellite_client_id")?.value;
   if (!clientId) redirect("/login");
 
-  const isH2o = clientId === "h2oallegiant";
+  // Clients that use the two-tab Active/Historical view instead of the
+  // Feed/Stack/Command demo toggle. Their tier is always read from the DB.
+  const usesTwoTabView = clientId === "h2oallegiant" || clientId === "gridvest";
 
   // Real subscription tier from DB — used for TopBar badge on all clients.
-  // h2oallegiant also uses it for gating; other clients use the demo URL toggle.
+  // Two-tab clients always use the DB tier for gating; others use the demo toggle.
   const subscriptionTier = await fetchClientTier(clientId);
-  const tier = isH2o
+  const tier = usesTwoTabView
     ? subscriptionTier
     : (isTier(params.tier) ? params.tier : "command");
 
-  const isHistorical = params.view === "historical" && isH2o;
+  const isHistorical = params.view === "historical" && usesTwoTabView;
 
   const feed = isHistorical
     ? await getHistoricalFeed(tier, { clientId })

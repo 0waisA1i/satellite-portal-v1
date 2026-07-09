@@ -27,7 +27,7 @@ export default function FeedView({
   isDemo?: boolean;
 }) {
   const { client, subscription, signals, stats } = feed;
-  const isH2o = client.id === "h2oallegiant";
+  const usesTabView = client.id === "h2oallegiant" || client.id === "gridvest";
   const isHistorical = view === "historical";
   const planTier = subscriptionTier ?? tier;
 
@@ -37,7 +37,7 @@ export default function FeedView({
       style={{ "--accent": ACCENT_HEX[client.accent] } as CSSProperties}
     >
       <TopBar client={client} subscriptionTier={planTier} />
-      {isH2o ? (
+      {usesTabView ? (
         <div className="flex items-center justify-center gap-[14px] border-b border-line bg-white/[0.02] px-[26px] py-[9px]">
           <div className="flex gap-[2px] rounded-[10px] border border-line bg-panel p-[3px]">
             <Link
