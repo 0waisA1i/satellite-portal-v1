@@ -3,7 +3,7 @@
 import { useCallback, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { GatedFeed, Subscription, Tier, VisibleSignal } from "@/lib/types";
-import { archetypeAccent } from "@/lib/archetypes";
+import { ACCENT_SEQUENCE, archetypeAccent } from "@/lib/archetypes";
 import { archiveSignalAction, restoreSignalAction } from "@/app/actions";
 import DetailSheet, { type SheetMode } from "./DetailSheet";
 import EnrichPanel from "./EnrichPanel";
@@ -93,8 +93,8 @@ function ArchetypeStrip({ signals }: { signals: VisibleSignal[] }) {
   if (archetypes.length === 0) return null;
   return (
     <div className="mb-[14px] flex flex-wrap gap-[8px]">
-      {archetypes.map((a) => {
-        const hex = archetypeAccent(a);
+      {archetypes.map((a, i) => {
+        const hex = ACCENT_SEQUENCE[i] ?? ACCENT_SEQUENCE[ACCENT_SEQUENCE.length - 1];
         return (
           <span
             key={a}

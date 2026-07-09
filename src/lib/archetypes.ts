@@ -7,6 +7,10 @@ export const ACCENT_HEX: Record<AccentName, string> = {
   grey: "#C1C1C1",
 };
 
+// Ordered accent palette for sequential assignment by index (e.g. archetype strip).
+// Index 0 = lime, 1 = mint, 2 = cyan, 3+ = coral fallback.
+export const ACCENT_SEQUENCE = ["#ECFD95", "#CBF3BA", "#40E3FD", "#FF8585"] as const;
+
 // Each archetype gets a distinct accent (CLAUDE.md): Gold-tier archetypes get
 // lime/mint, Silver channel cyan, Silver monitoring grey. Keyed by the human
 // label we display on the rail (the live DB stores coded archetypes like "A1";
