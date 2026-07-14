@@ -30,7 +30,11 @@ export async function fetchContactsForSignal(
 export async function restoreSignalAction(signalUuid: string): Promise<void> {
   const cookieStore = await cookies();
   const clientId = cookieStore.get("satellite_client_id")?.value;
-  if (clientId !== "h2oallegiant" && clientId !== "gridvest") return;
+  if (
+    clientId !== "h2oallegiant" &&
+    clientId !== "gridvest" &&
+    clientId !== "cleantechgrowthlab"
+  ) return;
 
   const supabase = getServerSupabase();
   const { error } = await supabase
@@ -46,7 +50,11 @@ export async function restoreSignalAction(signalUuid: string): Promise<void> {
 export async function archiveSignalAction(signalUuid: string): Promise<void> {
   const cookieStore = await cookies();
   const clientId = cookieStore.get("satellite_client_id")?.value;
-  if (clientId !== "h2oallegiant" && clientId !== "gridvest") return;
+  if (
+    clientId !== "h2oallegiant" &&
+    clientId !== "gridvest" &&
+    clientId !== "cleantechgrowthlab"
+  ) return;
 
   const supabase = getServerSupabase();
   const { error } = await supabase

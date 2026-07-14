@@ -22,7 +22,10 @@ export default async function FeedPage({
 
   // Clients that use the two-tab Active/Historical view instead of the
   // Feed/Stack/Command demo toggle. Their tier is always read from the DB.
-  const usesTwoTabView = clientId === "h2oallegiant" || clientId === "gridvest";
+  const usesTwoTabView =
+    clientId === "h2oallegiant" ||
+    clientId === "gridvest" ||
+    clientId === "cleantechgrowthlab";
 
   // Real subscription tier from DB — used for TopBar badge on all clients.
   // Two-tab clients always use the DB tier for gating; others use the demo toggle.

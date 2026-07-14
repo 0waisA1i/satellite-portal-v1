@@ -218,8 +218,10 @@ export default function FeedClient({
 
   const { tier } = feed.subscription;
   const isKathairos = feed.client.id === "kathairos";
-  const isGridvest = feed.client.id === "gridvest";
-  const usesTabView = feed.client.id === "h2oallegiant" || isGridvest;
+  const usesTabView =
+    feed.client.id === "h2oallegiant" ||
+    feed.client.id === "gridvest" ||
+    feed.client.id === "cleantechgrowthlab";
   const isHistorical = view === "historical";
 
   // Always exactly 1 teaser card; fall back to a placeholder if real teasers
@@ -229,7 +231,7 @@ export default function FeedClient({
 
   return (
     <>
-      {(isKathairos || isGridvest) && <ArchetypeStrip signals={feed.signals} />}
+      {(isKathairos || usesTabView) && <ArchetypeStrip signals={feed.signals} />}
 
       <div className="flex flex-col gap-[14px]">
         {feed.signals.map((s) => {

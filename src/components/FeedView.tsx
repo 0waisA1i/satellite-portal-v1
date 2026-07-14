@@ -27,7 +27,10 @@ export default function FeedView({
   isDemo?: boolean;
 }) {
   const { client, subscription, signals, stats } = feed;
-  const usesTabView = client.id === "h2oallegiant" || client.id === "gridvest";
+  const usesTabView =
+    client.id === "h2oallegiant" ||
+    client.id === "gridvest" ||
+    client.id === "cleantechgrowthlab";
   const isHistorical = view === "historical";
   const planTier = subscriptionTier ?? tier;
 
