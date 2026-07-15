@@ -24,6 +24,7 @@ function boldHeaders(ws: XLSX.WorkSheet, headers: string[]) {
 }
 
 const SIGNAL_HEADERS = [
+  "Signal ID",
   "Company",
   "Domain",
   "Signal Type",
@@ -49,6 +50,7 @@ const CONTACT_HEADERS = [
 
 function makeSignalsSheet(signals: VisibleSignal[]): XLSX.WorkSheet {
   const rows = signals.map((s) => [
+    s.signal_id,
     s.account.name,
     parseDomain(s.source_url),
     s.archetype,
