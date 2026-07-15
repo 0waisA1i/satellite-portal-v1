@@ -300,7 +300,7 @@ export default function DetailSheet({
                       </button>
                       <button
                         className={btnGhost}
-                        onClick={() => onToast("Pushed to CRM as a task")}
+                        onClick={() => onToast("CRM push coming in a later version")}
                       >
                         Push to CRM
                       </button>
