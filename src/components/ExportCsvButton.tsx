@@ -36,6 +36,8 @@ const SIGNAL_HEADERS = [
   "Source URL",
   "Suggested Next Step",
   "Target Persona",
+  "Signal Intelligence",
+  "Outreach Angle",
 ];
 
 const CONTACT_HEADERS = [
@@ -62,6 +64,8 @@ function makeSignalsSheet(signals: VisibleSignal[]): XLSX.WorkSheet {
     s.source_url,
     s.suggested_next_step,
     s.target_titles.join("; "),
+    s.summary,
+    s.outreach_angle,
   ]);
   const ws = XLSX.utils.aoa_to_sheet([SIGNAL_HEADERS, ...rows]);
   boldHeaders(ws, SIGNAL_HEADERS);
