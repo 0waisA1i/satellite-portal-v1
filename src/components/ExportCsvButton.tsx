@@ -39,8 +39,8 @@ const SIGNAL_HEADERS = [
 ];
 
 const CONTACT_HEADERS = [
-  "Company",
   "Signal ID",
+  "Company",
   "Archetype",
   "Name",
   "Title",
@@ -70,8 +70,8 @@ function makeSignalsSheet(signals: VisibleSignal[]): XLSX.WorkSheet {
 
 function makeContactsSheet(contacts: ExportContactRow[]): XLSX.WorkSheet {
   const rows = contacts.map((c) => [
-    c.company,
     c.signal_id,
+    c.company,
     c.archetype,
     c.name,
     c.title,
