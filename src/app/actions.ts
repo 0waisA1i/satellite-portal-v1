@@ -3,6 +3,56 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { getServerSupabase } from "@/lib/supabase";
+import { archetypeLabel } from "@/lib/archetypes";
+
+// Rows returned for the Contacts sheet in the Excel export.
+// Joined server-side so the client never needs its own Supabase query.
+export interface ExportContactRow {
+  company: string;
+  signal_id: string;  // human-readable text code e.g. "KAT-001"
+  archetype: string;  // resolved label, not raw code
+  name: string;
+  title: string;
+  email: string;
+  linkedin_url: string;
+}
+
+export async function fetchContactsForExport(): Promise<ExportContactRow[]> {
+  const cookieStore = await cookies();
+  const clientId = cookieStore.get("satellite_client_id")?.value;
+  if (!clientId) return [];
+
+  const supabase = getServerSupabase();
+
+  // Pull all signals for this client so we can join company/signal_id/archetype.
+  const { data: signals, error: sigError } = await supabase
+    .from("signals")
+    .select("id, signal_id, company, archetype")
+    .eq("client_id", clientId);
+  if (sigError || !signals?.length) return [];
+
+  const sigMap = new Map((signals as any[]).map((s) => [s.id as string, s as any]));
+  const signalIds = (signals as any[]).map((s) => s.id as string);
+
+  const { data: contacts, error: conError } = await (supabase as any)
+    .from("contacts")
+    .select("name, title, email, linkedin_url, signal_id")
+    .in("signal_id", signalIds);
+  if (conError) throw new Error(`contacts export fetch failed: ${conError.message}`);
+
+  return ((contacts ?? []) as any[]).map((c) => {
+    const sig = sigMap.get(c.signal_id as string);
+    return {
+      company: sig?.company ?? "",
+      signal_id: sig?.signal_id ?? "",
+      archetype: archetypeLabel(sig?.archetype ?? ""),
+      name: c.name ?? "",
+      title: c.title ?? "",
+      email: c.email ?? "",
+      linkedin_url: c.linkedin_url ?? "",
+    };
+  });
+}
 
 export interface EnrichedContact {
   id: string;

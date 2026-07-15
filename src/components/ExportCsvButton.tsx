@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import * as XLSX from "xlsx";
 import type { VisibleSignal } from "@/lib/types";
+import { fetchContactsForExport, type ExportContactRow } from "@/app/actions";
 
 function parseDomain(url: string): string {
   if (!url) return "";
@@ -12,7 +14,16 @@ function parseDomain(url: string): string {
   }
 }
 
-const HEADERS = [
+function boldHeaders(ws: XLSX.WorkSheet, headers: string[]) {
+  for (let col = 0; col < headers.length; col++) {
+    const addr = XLSX.utils.encode_cell({ r: 0, c: col });
+    if (!ws[addr]) ws[addr] = { t: "s", v: headers[col] };
+    ws[addr].s = { font: { bold: true } };
+  }
+  ws["!cols"] = headers.map(() => ({ wch: 20 }));
+}
+
+const SIGNAL_HEADERS = [
   "Company",
   "Domain",
   "Signal Type",
@@ -26,7 +37,17 @@ const HEADERS = [
   "Target Persona",
 ];
 
-function toWorkbook(signals: VisibleSignal[]): XLSX.WorkBook {
+const CONTACT_HEADERS = [
+  "Company",
+  "Signal ID",
+  "Archetype",
+  "Name",
+  "Title",
+  "Email",
+  "LinkedIn",
+];
+
+function makeSignalsSheet(signals: VisibleSignal[]): XLSX.WorkSheet {
   const rows = signals.map((s) => [
     s.account.name,
     parseDomain(s.source_url),
@@ -40,24 +61,24 @@ function toWorkbook(signals: VisibleSignal[]): XLSX.WorkBook {
     s.suggested_next_step,
     s.target_titles.join("; "),
   ]);
+  const ws = XLSX.utils.aoa_to_sheet([SIGNAL_HEADERS, ...rows]);
+  boldHeaders(ws, SIGNAL_HEADERS);
+  return ws;
+}
 
-  const ws = XLSX.utils.aoa_to_sheet([HEADERS, ...rows]);
-
-  // Apply bold to every header cell explicitly
-  for (let col = 0; col < HEADERS.length; col++) {
-    const addr = XLSX.utils.encode_cell({ r: 0, c: col });
-    if (!ws[addr]) {
-      ws[addr] = { t: "s", v: HEADERS[col] };
-    }
-    ws[addr].s = { font: { bold: true } };
-  }
-
-  // Fixed column width of 20 characters for all columns
-  ws["!cols"] = HEADERS.map(() => ({ wch: 20 }));
-
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Signals");
-  return wb;
+function makeContactsSheet(contacts: ExportContactRow[]): XLSX.WorkSheet {
+  const rows = contacts.map((c) => [
+    c.company,
+    c.signal_id,
+    c.archetype,
+    c.name,
+    c.title,
+    c.email,
+    c.linkedin_url,
+  ]);
+  const ws = XLSX.utils.aoa_to_sheet([CONTACT_HEADERS, ...rows]);
+  boldHeaders(ws, CONTACT_HEADERS);
+  return ws;
 }
 
 export default function ExportCsvButton({
@@ -67,26 +88,37 @@ export default function ExportCsvButton({
   signals: VisibleSignal[];
   period: string;
 }) {
-  function handleExport() {
-    const wb = toWorkbook(signals);
+  const [loading, setLoading] = useState(false);
 
-    // Use XLSX.write with type:'array' + manual Blob for reliable style output in browsers
-    const buf = XLSX.write(wb, { bookType: "xlsx", type: "array", cellStyles: true });
-    const blob = new Blob([buf], {
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `signals-${period}.xlsx`;
-    a.click();
-    URL.revokeObjectURL(url);
+  async function handleExport() {
+    setLoading(true);
+    try {
+      const contacts = await fetchContactsForExport();
+
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, makeSignalsSheet(signals), "Signals");
+      XLSX.utils.book_append_sheet(wb, makeContactsSheet(contacts), "Contacts");
+
+      const buf = XLSX.write(wb, { bookType: "xlsx", type: "array", cellStyles: true });
+      const blob = new Blob([buf], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `signals-${period}.xlsx`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
     <button
       onClick={handleExport}
-      className="inline-flex items-center gap-[6px] rounded-[8px] bg-[#E8E8E8] px-[13px] py-[6px] text-[11px] font-semibold text-black transition hover:bg-[#D8D8D8]"
+      disabled={loading}
+      className="inline-flex items-center gap-[6px] rounded-[8px] bg-[#E8E8E8] px-[13px] py-[6px] text-[11px] font-semibold text-black transition hover:bg-[#D8D8D8] disabled:opacity-60"
     >
       <svg
         viewBox="0 0 16 16"
@@ -97,7 +129,7 @@ export default function ExportCsvButton({
       >
         <path d="M8 2v8M5 7l3 3 3-3M3 12h10" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
-      Export Excel
+      {loading ? "Exporting…" : "Export Excel"}
     </button>
   );
 }
