@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { getServerSupabase } from "@/lib/supabase";
 import { archetypeLabel } from "@/lib/archetypes";
+import { fetchClientTier } from "@/lib/live";
 
 // Rows returned for the Contacts sheet in the Excel export.
 // Joined server-side so the client never needs its own Supabase query.
@@ -17,14 +18,21 @@ export interface ExportContactRow {
   linkedin_url: string;
 }
 
-export async function fetchContactsForExport(): Promise<ExportContactRow[]> {
+// Returns null when the Contacts tab should be omitted entirely (signal_feed
+// tier). Returns an array (possibly empty) for stack/command — the caller adds
+// the tab only when the array is non-empty.
+export async function fetchContactsForExport(): Promise<ExportContactRow[] | null> {
   const cookieStore = await cookies();
   const clientId = cookieStore.get("satellite_client_id")?.value;
-  if (!clientId) return [];
+  if (!clientId) return null;
+
+  // signal_feed clients (e.g. Kathairos) do not get a Contacts tab.
+  const tier = await fetchClientTier(clientId);
+  if (tier === "feed") return null;
 
   const supabase = getServerSupabase();
 
-  // Pull all signals for this client so we can join company/signal_id/archetype.
+  // Pull signals for this client to join company / signal_id / archetype.
   const { data: signals, error: sigError } = await supabase
     .from("signals")
     .select("id, signal_id, company, archetype")

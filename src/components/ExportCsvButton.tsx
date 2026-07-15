@@ -97,7 +97,11 @@ export default function ExportCsvButton({
 
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, makeSignalsSheet(signals), "Signals");
-      XLSX.utils.book_append_sheet(wb, makeContactsSheet(contacts), "Contacts");
+      // contacts is null for signal_feed clients; omit tab entirely.
+      // For stack/command, only add the tab if at least one contact exists.
+      if (contacts && contacts.length > 0) {
+        XLSX.utils.book_append_sheet(wb, makeContactsSheet(contacts), "Contacts");
+      }
 
       const buf = XLSX.write(wb, { bookType: "xlsx", type: "array", cellStyles: true });
       const blob = new Blob([buf], {
