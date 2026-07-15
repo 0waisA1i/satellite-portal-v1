@@ -28,16 +28,17 @@ const SIGNAL_HEADERS = [
   "Company",
   "Domain",
   "Signal Type",
-  "Confidence",
   "Tier",
+  "Confidence",
   "Status",
   "Days Until Stale",
   "Last Seen",
-  "Source URL",
+  "Signal Intelligence",
+  "Why Now",
+  "Outreach Angle",
   "Suggested Next Step",
   "Target Persona",
-  "Signal Intelligence",
-  "Outreach Angle",
+  "Source URL",
 ];
 
 const CONTACT_HEADERS = [
@@ -56,16 +57,17 @@ function makeSignalsSheet(signals: VisibleSignal[]): XLSX.WorkSheet {
     s.account.name,
     parseDomain(s.source_url),
     s.archetype,
-    s.confidence_current,
     s.trigger_label.replace(/·/g, "-"),
+    s.confidence_current,
     s.status,
     s.act_within_days,
     s.deadline_date,
-    s.source_url,
+    s.summary,
+    s.why_now,
+    s.outreach_angle,
     s.suggested_next_step,
     s.target_titles.join("; "),
-    s.summary,
-    s.outreach_angle,
+    s.source_url,
   ]);
   const ws = XLSX.utils.aoa_to_sheet([SIGNAL_HEADERS, ...rows]);
   boldHeaders(ws, SIGNAL_HEADERS);
