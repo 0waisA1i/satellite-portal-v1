@@ -27,10 +27,11 @@ export default function FeedView({
   isDemo?: boolean;
 }) {
   const { client, subscription, signals, stats } = feed;
+  const isH2o = client.id === "h2oallegiant";
   const usesTabView =
-    client.id === "h2oallegiant" ||
     client.id === "gridvest" ||
-    client.id === "cleantechgrowthlab";
+    client.id === "cleantechgrowthlab" ||
+    client.id === "ensights";
   const isHistorical = view === "historical";
   const planTier = subscriptionTier ?? tier;
 
@@ -40,8 +41,34 @@ export default function FeedView({
       style={{ "--accent": ACCENT_HEX[client.accent] } as CSSProperties}
     >
       <TopBar client={client} subscriptionTier={planTier} />
-      {usesTabView ? (
-        <div className="flex items-center justify-center gap-[14px] border-b border-line bg-white/[0.02] px-[26px] py-[9px]">
+      {isH2o ? (
+        // h2oallegiant: tier tabs (Feed/Stack/Command) + Historical link, no demo label
+        <div className="flex items-center justify-center border-b border-line bg-white/[0.02] px-[26px] py-[9px]">
+          <div className="flex gap-[2px] rounded-[10px] border border-line bg-panel p-[3px]">
+            {(["feed", "stack", "command"] as const).map((t) => (
+              <Link
+                key={t}
+                href={`${basePath}?tier=${t}`}
+                className={`rounded-[7px] px-[16px] py-[6px] text-[12px] font-semibold capitalize transition ${
+                  !isHistorical && tier === t ? "bg-accent text-black" : "text-txt-3"
+                }`}
+              >
+                {t.charAt(0).toUpperCase() + t.slice(1)}
+              </Link>
+            ))}
+            <span className="mx-[4px] self-center border-l border-line-2" style={{ height: 18 }} />
+            <Link
+              href={`${basePath}?view=historical`}
+              className={`rounded-[7px] px-[16px] py-[6px] text-[12px] font-semibold transition ${
+                isHistorical ? "bg-accent text-black" : "text-txt-3"
+              }`}
+            >
+              Historical
+            </Link>
+          </div>
+        </div>
+      ) : usesTabView ? (
+        <div className="flex items-center justify-center border-b border-line bg-white/[0.02] px-[26px] py-[9px]">
           <div className="flex gap-[2px] rounded-[10px] border border-line bg-panel p-[3px]">
             <Link
               href={basePath}

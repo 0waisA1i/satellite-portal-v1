@@ -3,7 +3,7 @@
 import { useCallback, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { GatedFeed, Subscription, Tier, VisibleSignal } from "@/lib/types";
-import { ACCENT_SEQUENCE, archetypeAccent } from "@/lib/archetypes";
+import { ACCENT_SEQUENCE } from "@/lib/archetypes";
 import { archiveSignalAction, restoreSignalAction } from "@/app/actions";
 import DetailSheet, { type SheetMode } from "./DetailSheet";
 import EnrichPanel from "./EnrichPanel";
@@ -218,10 +218,14 @@ export default function FeedClient({
 
   const { tier } = feed.subscription;
   const isKathairos = feed.client.id === "kathairos";
+  const isH2o = feed.client.id === "h2oallegiant";
+  // Active/Historical tab-view clients (h2oallegiant excluded — it uses tier tabs)
   const usesTabView =
-    feed.client.id === "h2oallegiant" ||
     feed.client.id === "gridvest" ||
-    feed.client.id === "cleantechgrowthlab";
+    feed.client.id === "cleantechgrowthlab" ||
+    feed.client.id === "ensights";
+  // Archive/Restore apply to h2oallegiant AND all tab-view clients
+  const hasArchiveFeature = isH2o || usesTabView;
   const isHistorical = view === "historical";
 
   // Always exactly 1 teaser card; fall back to a placeholder if real teasers
@@ -261,7 +265,7 @@ export default function FeedClient({
                 onOutreach={() => setSheet({ signal: s, mode: "outreach" })}
                 onCrm={() => showToast("CRM push runs in later version")}
                 onArchive={
-                  usesTabView && !isHistorical
+                  hasArchiveFeature && !isHistorical
                     ? triggerExit(s.signal_id, "up", async () => {
                         await archiveSignalAction(s.id);
                         router.refresh();
@@ -269,7 +273,7 @@ export default function FeedClient({
                     : undefined
                 }
                 onRestore={
-                  usesTabView && isHistorical
+                  hasArchiveFeature && isHistorical
                     ? triggerExit(s.signal_id, "down", async () => {
                         await restoreSignalAction(s.id);
                         router.refresh();

@@ -33,7 +33,8 @@ export async function restoreSignalAction(signalUuid: string): Promise<void> {
   if (
     clientId !== "h2oallegiant" &&
     clientId !== "gridvest" &&
-    clientId !== "cleantechgrowthlab"
+    clientId !== "cleantechgrowthlab" &&
+    clientId !== "ensights"
   ) return;
 
   const supabase = getServerSupabase();
@@ -53,7 +54,8 @@ export async function archiveSignalAction(signalUuid: string): Promise<void> {
   if (
     clientId !== "h2oallegiant" &&
     clientId !== "gridvest" &&
-    clientId !== "cleantechgrowthlab"
+    clientId !== "cleantechgrowthlab" &&
+    clientId !== "ensights"
   ) return;
 
   const supabase = getServerSupabase();

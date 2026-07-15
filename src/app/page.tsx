@@ -20,21 +20,26 @@ export default async function FeedPage({
   const clientId = cookieStore.get("satellite_client_id")?.value;
   if (!clientId) redirect("/login");
 
-  // Clients that use the two-tab Active/Historical view instead of the
-  // Feed/Stack/Command demo toggle. Their tier is always read from the DB.
-  const usesTwoTabView =
-    clientId === "h2oallegiant" ||
-    clientId === "gridvest" ||
-    clientId === "cleantechgrowthlab";
+  const isH2o = clientId === "h2oallegiant";
 
-  // Real subscription tier from DB — used for TopBar badge on all clients.
-  // Two-tab clients always use the DB tier for gating; others use the demo toggle.
+  // Clients that use the Active/Historical two-tab view. h2oallegiant is
+  // excluded: it keeps Feed/Stack/Command tier tabs + a Historical link.
+  const usesTwoTabView =
+    clientId === "gridvest" ||
+    clientId === "cleantechgrowthlab" ||
+    clientId === "ensights";
+
+  // Real subscription tier from DB — always fetched for the TopBar badge.
+  // Tab-view clients gate by DB tier. h2oallegiant defaults to DB tier but
+  // URL param overrides it (tier tab links). Others use the demo URL toggle.
   const subscriptionTier = await fetchClientTier(clientId);
   const tier = usesTwoTabView
     ? subscriptionTier
-    : (isTier(params.tier) ? params.tier : "command");
+    : (isTier(params.tier) ? params.tier : subscriptionTier ?? "command");
 
-  const isHistorical = params.view === "historical" && usesTwoTabView;
+  // Historical view: tab-view clients via ?view=historical, and h2oallegiant
+  // which keeps the Historical link in its tier-tab nav.
+  const isHistorical = params.view === "historical" && (usesTwoTabView || isH2o);
 
   const feed = isHistorical
     ? await getHistoricalFeed(tier, { clientId })
