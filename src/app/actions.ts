@@ -90,6 +90,7 @@ export async function restoreSignalAction(signalUuid: string): Promise<void> {
   const clientId = cookieStore.get("satellite_client_id")?.value;
   if (
     clientId !== "h2oallegiant" &&
+    clientId !== "kathairos" &&
     clientId !== "gridvest" &&
     clientId !== "cleantechgrowthlab" &&
     clientId !== "ensights"
@@ -111,6 +112,7 @@ export async function archiveSignalAction(signalUuid: string): Promise<void> {
   const clientId = cookieStore.get("satellite_client_id")?.value;
   if (
     clientId !== "h2oallegiant" &&
+    clientId !== "kathairos" &&
     clientId !== "gridvest" &&
     clientId !== "cleantechgrowthlab" &&
     clientId !== "ensights"

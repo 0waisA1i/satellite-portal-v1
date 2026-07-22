@@ -221,6 +221,7 @@ export default function FeedClient({
   const isH2o = feed.client.id === "h2oallegiant";
   // Active/Historical tab-view clients (h2oallegiant excluded — it uses tier tabs)
   const usesTabView =
+    feed.client.id === "kathairos" ||
     feed.client.id === "gridvest" ||
     feed.client.id === "cleantechgrowthlab" ||
     feed.client.id === "ensights";
@@ -235,7 +236,7 @@ export default function FeedClient({
 
   return (
     <>
-      {(isKathairos || usesTabView) && <ArchetypeStrip signals={feed.signals} />}
+      {usesTabView && <ArchetypeStrip signals={feed.signals} />}
 
       <div className="flex flex-col gap-[14px]">
         {feed.signals.map((s) => {

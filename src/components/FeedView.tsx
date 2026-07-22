@@ -29,6 +29,7 @@ export default function FeedView({
   const { client, subscription, signals, stats } = feed;
   const isH2o = client.id === "h2oallegiant";
   const usesTabView =
+    client.id === "kathairos" ||
     client.id === "gridvest" ||
     client.id === "cleantechgrowthlab" ||
     client.id === "ensights";

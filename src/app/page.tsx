@@ -25,6 +25,7 @@ export default async function FeedPage({
   // Clients that use the Active/Historical two-tab view. h2oallegiant is
   // excluded: it keeps Feed/Stack/Command tier tabs + a Historical link.
   const usesTwoTabView =
+    clientId === "kathairos" ||
     clientId === "gridvest" ||
     clientId === "cleantechgrowthlab" ||
     clientId === "ensights";
