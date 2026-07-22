@@ -257,6 +257,7 @@ export default function FeedClient({
                 signal={s}
                 subscription={feed.subscription}
                 hideVolume={isKathairos}
+                isH2o={isH2o}
                 onDetail={() => setSheet({ signal: s, mode: "detail" })}
                 onEnrich={() =>
                   isKathairos
@@ -309,6 +310,7 @@ export default function FeedClient({
         signal={sheet?.signal ?? null}
         subscription={feed.subscription}
         mode={sheet?.mode ?? "detail"}
+        isH2o={isH2o}
         onClose={() => setSheet(null)}
         onOutreach={() =>
           setSheet((s) => (s ? { ...s, mode: "outreach" } : s))

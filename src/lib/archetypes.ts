@@ -61,6 +61,16 @@ export function formatDeadline(iso: string): string {
   return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
+export function formatRelativeDeadline(iso: string): string {
+  const d = new Date(iso + "T00:00:00");
+  if (Number.isNaN(d.getTime())) return iso;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const diffDays = Math.round((d.getTime() - today.getTime()) / 86_400_000);
+  if (diffDays < 0) return "overdue";
+  return `in ${diffDays} days`;
+}
+
 export function formatPeriod(period: string): string {
   const [y, m] = period.split("-").map(Number);
   if (!y || !m) return period;

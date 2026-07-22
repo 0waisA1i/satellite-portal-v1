@@ -1,5 +1,5 @@
 import type { Subscription, VisibleSignal } from "@/lib/types";
-import { archetypeAccent, formatDeadline } from "@/lib/archetypes";
+import { archetypeAccent, formatDeadline, formatRelativeDeadline } from "@/lib/archetypes";
 import ActPill from "./ActPill";
 import ArchetypeRail from "./ArchetypeRail";
 import ContactRow from "./ContactRow";
@@ -54,6 +54,7 @@ export default function SignalCard({
   signal,
   subscription,
   hideVolume = false,
+  isH2o = false,
   onDetail,
   onEnrich,
   onOutreach,
@@ -64,6 +65,7 @@ export default function SignalCard({
   signal: VisibleSignal;
   subscription: Subscription;
   hideVolume?: boolean;
+  isH2o?: boolean;
   onDetail: () => void;
   onEnrich: () => void;
   onOutreach: () => void;
@@ -107,11 +109,13 @@ export default function SignalCard({
             </div>
             <div className="flex shrink-0 gap-[7px] max-md:w-full max-md:justify-between">
               <div className="min-w-[66px] rounded-[10px] border border-line bg-white/[0.04] px-[14px] py-[9px] text-center">
-                <span className="block text-[18px] font-bold leading-none tracking-[-0.02em]">
-                  {formatDeadline(signal.deadline_date)}
+                <span className={`block font-bold leading-none tracking-[-0.02em] ${isH2o ? "text-[13px]" : "text-[18px]"}`}>
+                  {isH2o
+                    ? formatRelativeDeadline(signal.deadline_date)
+                    : formatDeadline(signal.deadline_date)}
                 </span>
                 <span className="mt-[4px] block text-[6.5px] font-semibold uppercase tracking-[0.1em] text-txt-3">
-                  Deadline
+                  {isH2o ? "Outreach By" : "Deadline"}
                 </span>
               </div>
               {!hideVolume && (

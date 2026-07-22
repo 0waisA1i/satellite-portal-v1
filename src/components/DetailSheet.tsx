@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import type { Subscription, VisibleSignal } from "@/lib/types";
-import { archetypeAccent } from "@/lib/archetypes";
+import { archetypeAccent, formatRelativeDeadline } from "@/lib/archetypes";
 import ActPill from "./ActPill";
 import ContactRow from "./ContactRow";
 import { LockIcon, PenIcon } from "./icons";
@@ -52,6 +52,7 @@ export default function DetailSheet({
   signal,
   subscription,
   mode,
+  isH2o = false,
   onClose,
   onOutreach,
   onToast,
@@ -59,6 +60,7 @@ export default function DetailSheet({
   signal: VisibleSignal | null;
   subscription: Subscription;
   mode: SheetMode;
+  isH2o?: boolean;
   onClose: () => void;
   onOutreach: () => void;
   onToast: (msg: string) => void;
@@ -241,8 +243,8 @@ export default function DetailSheet({
                       <dd>{signal.confidence_current} / 100</dd>
                       <dt className="font-semibold text-txt-3">Act within</dt>
                       <dd>{signal.act_within_days} days</dd>
-                      <dt className="font-semibold text-txt-3">Deadline</dt>
-                      <dd>{signal.deadline_date}</dd>
+                      <dt className="font-semibold text-txt-3">{isH2o ? "Outreach By" : "Deadline"}</dt>
+                      <dd>{isH2o ? formatRelativeDeadline(signal.deadline_date) : signal.deadline_date}</dd>
                       <dt className="font-semibold text-txt-3">Est. volume</dt>
                       <dd>{signal.est_volume}</dd>
                     </dl>
