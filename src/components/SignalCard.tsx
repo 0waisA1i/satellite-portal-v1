@@ -55,6 +55,7 @@ export default function SignalCard({
   subscription,
   hideVolume = false,
   isH2o = false,
+  isEnsights = false,
   onDetail,
   onEnrich,
   onOutreach,
@@ -66,6 +67,7 @@ export default function SignalCard({
   subscription: Subscription;
   hideVolume?: boolean;
   isH2o?: boolean;
+  isEnsights?: boolean;
   onDetail: () => void;
   onEnrich: () => void;
   onOutreach: () => void;
@@ -118,13 +120,23 @@ export default function SignalCard({
                   {isH2o ? "Outreach By" : "Deadline"}
                 </span>
               </div>
-              {!hideVolume && (
+              {!hideVolume && !isEnsights && (
                 <div className="min-w-[66px] rounded-[10px] border border-line bg-white/[0.04] px-[14px] py-[9px] text-center">
                   <span className="block text-[13px] font-bold leading-none tracking-[-0.02em]">
                     {signal.est_volume}
                   </span>
                   <span className="mt-[4px] block text-[6.5px] font-semibold uppercase tracking-[0.1em] text-txt-3">
                     30-day vol
+                  </span>
+                </div>
+              )}
+              {isEnsights && (
+                <div className="min-w-[66px] rounded-[10px] border border-line bg-white/[0.04] px-[14px] py-[9px] text-center">
+                  <span className="block text-[13px] font-bold leading-none tracking-[-0.02em]">
+                    {formatRelativeDeadline(signal.deadline_date, signal.act_within_days)}
+                  </span>
+                  <span className="mt-[4px] block text-[6.5px] font-semibold uppercase tracking-[0.1em] text-txt-3">
+                    Outreach By
                   </span>
                 </div>
               )}

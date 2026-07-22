@@ -219,6 +219,7 @@ export default function FeedClient({
   const { tier } = feed.subscription;
   const isKathairos = feed.client.id === "kathairos";
   const isH2o = feed.client.id === "h2oallegiant";
+  const isEnsights = feed.client.id === "ensights";
   // Active/Historical tab-view clients (h2oallegiant excluded — it uses tier tabs)
   const usesTabView =
     feed.client.id === "kathairos" ||
@@ -258,6 +259,7 @@ export default function FeedClient({
                 subscription={feed.subscription}
                 hideVolume={isKathairos}
                 isH2o={isH2o}
+                isEnsights={isEnsights}
                 onDetail={() => setSheet({ signal: s, mode: "detail" })}
                 onEnrich={() =>
                   isKathairos
