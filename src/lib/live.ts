@@ -60,9 +60,12 @@ function firstSentence(text: string): string {
 function mapRow(row: SignalRow, window?: ApproachWindowRow): Signal {
   const summary = sanitize(row.summary);
   const archetypeName = archetypeLabel(row.archetype);
-  const actWithin = window?.days_until_stale != null
-    ? Math.max(0, Math.round(window.days_until_stale))
-    : 30; // GAP: no act-window source for signals without an approach_windows row
+  // Formula: (current_confidence - 50) / decay_rate * 7
+  // The signal hits the 50-pt stale threshold after this many days from last_seen.
+  // Negative values mean already stale; callers render these as "overdue".
+  const actWithin = row.decay_rate > 0
+    ? Math.round((row.current_confidence - 50) / row.decay_rate * 7)
+    : 0;
 
   return {
     id: row.id,
@@ -87,8 +90,9 @@ function mapRow(row: SignalRow, window?: ApproachWindowRow): Signal {
     false_positive_filter: "", // GAP: lives in icp_configs.config, not per signal
     rank_boost_flags: row.boost_flags ?? [],
     confidence_current: row.current_confidence,
-    // GAP: no deadline column. Use the view's optimal outreach date as a proxy.
-    deadline_date: window?.optimal_outreach_date ?? row.last_seen,
+    // Always anchor to last_seen. The h2o "Outreach By" chip adds act_within_days
+    // as an offset; other clients display this as an absolute date ("Last Seen").
+    deadline_date: row.last_seen,
     act_within_days: actWithin,
     est_volume: "", // GAP: no volume column
     status: (row.status as Signal["status"]) ?? "active",
