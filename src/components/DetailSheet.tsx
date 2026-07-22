@@ -244,7 +244,7 @@ export default function DetailSheet({
                       <dt className="font-semibold text-txt-3">Act within</dt>
                       <dd>{signal.act_within_days} days</dd>
                       <dt className="font-semibold text-txt-3">{isH2o ? "Outreach By" : "Deadline"}</dt>
-                      <dd>{isH2o ? formatRelativeDeadline(signal.deadline_date) : signal.deadline_date}</dd>
+                      <dd>{isH2o ? formatRelativeDeadline(signal.deadline_date, signal.act_within_days) : signal.deadline_date}</dd>
                       <dt className="font-semibold text-txt-3">Est. volume</dt>
                       <dd>{signal.est_volume}</dd>
                     </dl>

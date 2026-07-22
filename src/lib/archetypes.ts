@@ -61,13 +61,17 @@ export function formatDeadline(iso: string): string {
   return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
-export function formatRelativeDeadline(iso: string): string {
+// actWithinDays: add this offset to the base ISO date before computing the diff.
+// Used when the base date is "last seen" and the outreach deadline is last_seen + days_until_stale.
+export function formatRelativeDeadline(iso: string, actWithinDays = 0): string {
   const d = new Date(iso + "T00:00:00");
   if (Number.isNaN(d.getTime())) return iso;
+  if (actWithinDays) d.setDate(d.getDate() + actWithinDays);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const diffDays = Math.round((d.getTime() - today.getTime()) / 86_400_000);
   if (diffDays < 0) return "overdue";
+  if (diffDays === 0) return "today";
   return `in ${diffDays} days`;
 }
 

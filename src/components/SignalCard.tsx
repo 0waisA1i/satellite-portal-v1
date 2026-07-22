@@ -111,7 +111,7 @@ export default function SignalCard({
               <div className="min-w-[66px] rounded-[10px] border border-line bg-white/[0.04] px-[14px] py-[9px] text-center">
                 <span className={`block font-bold leading-none tracking-[-0.02em] ${isH2o ? "text-[13px]" : "text-[18px]"}`}>
                   {isH2o
-                    ? formatRelativeDeadline(signal.deadline_date)
+                    ? formatRelativeDeadline(signal.deadline_date, signal.act_within_days)
                     : formatDeadline(signal.deadline_date)}
                 </span>
                 <span className="mt-[4px] block text-[6.5px] font-semibold uppercase tracking-[0.1em] text-txt-3">
