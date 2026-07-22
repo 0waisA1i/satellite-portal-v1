@@ -257,9 +257,8 @@ export default function FeedClient({
               <SignalCard
                 signal={s}
                 subscription={feed.subscription}
-                hideVolume={isKathairos}
+                hideVolume={isKathairos || isEnsights}
                 isH2o={isH2o}
-                isEnsights={isEnsights}
                 onDetail={() => setSheet({ signal: s, mode: "detail" })}
                 onEnrich={() =>
                   isKathairos
