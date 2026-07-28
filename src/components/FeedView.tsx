@@ -37,7 +37,14 @@ export default function FeedView({
   return (
     <div
       className="min-h-screen"
-      style={{ "--accent": ACCENT_HEX[client.accent] } as CSSProperties}
+      style={{
+        "--accent": ACCENT_HEX[client.accent],
+        ...(isH2o && {
+          backgroundImage:
+            "radial-gradient(circle, rgba(236,253,149,0.18) 1px, transparent 1px)",
+          backgroundSize: "24px 24px",
+        }),
+      } as CSSProperties}
     >
       <TopBar client={client} subscriptionTier={planTier} />
       {isH2o ? (
