@@ -1,139 +1,526 @@
-// Generated from the LIVE Supabase schema (project vrxgpqezcfoqvdvtrtau, public schema)
-// via the PostgREST OpenAPI definition on 2026-06-13. Introspected, not hand-written.
-//
-// This is the data contract as it exists today. It does NOT yet match the proposed
-// schema in docs/Satellite_Portal_BuildSpec.md or the UI shape in src/lib/types.ts.
-// See the gap list in that mapping work before wiring the Feed to live reads.
-//
-// Only four objects are exposed in `public`: signals, icp_configs, scan_runs (tables)
-// and approach_windows (a view). There is no clients, subscriptions, accounts, or
-// contacts table yet.
-//
-// user_clients is the expected auth-to-client mapping table (not yet introspected).
-// Expected schema: { user_id uuid FK auth.users, client_id text FK icp_configs.client_id }
-// Create it in Supabase before enabling the login flow.
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
 
-export type SignalRow = {
-  id: string; // uuid, pk
-  client_id: string; // text, e.g. "kathairos" (NOT a uuid FK to a clients table)
-  signal_id: string; // text, e.g. "KAT-001"
-  archetype: string; // text, coded: "A1" | "A2" | "A4" (not human-readable names)
-  archetype_tier: string; // text, "Gold" | "Silver" (Bronze proposed, not yet seen)
-  title: string;
-  company: string; // text free-form (NOT normalized to an accounts entity)
-  summary: string | null;
-  source_url: string | null;
-  target_persona: string | null; // single blended text blob, e.g. "Primary: ... | Secondary: ..."
-  next_step: string | null;
-  boost_flags: string[] | null;
-  expansion_flag: boolean | null;
-  surfaced: boolean | null;
-  why_now: string | null;
-  outreach_angle: string | null;
-  initial_confidence: number; // int
-  current_confidence: number; // int, live score after weekly decay
-  decay_rate: number; // int, points/week. Gold=2, Silver=4, Bronze=6
-  status: string; // text, observed: "active"
-  priority_tier: string | null; // text, "Tier 1" | "Tier 2" | "Tier 3"
-  first_seen: string; // date
-  last_seen: string; // date
-  last_decay_applied: string | null; // timestamptz
-  scan_count: number; // int
-  notes: string | null;
-  created_at: string | null; // timestamptz
-  updated_at: string | null; // timestamptz
-}
-
-export type IcpConfigRow = {
-  id: string; // uuid, pk
-  client_id: string; // text short code, e.g. "kathairos"
-  client_name: string; // e.g. "Kathairos Solutions"
-  domain: string | null; // e.g. "kathairos.com"
-  version: number; // int
-  status: string; // text, e.g. "locked"
-  config: Record<string, unknown>; // jsonb: sectors, geos, personas, archetypes, false-positive filters
-  locked_at: string | null; // timestamptz
-  created_at: string | null; // timestamptz
-  updated_at: string | null; // timestamptz
-}
-
-export type ScanRunRow = {
-  id: string; // uuid, pk
-  client_id: string; // text
-  run_date: string; // date
-  triggered_by: string; // text
-  status: string; // text
-  signals_found: number | null;
-  signals_new: number | null;
-  signals_refreshed: number | null;
-  signals_decayed: number | null;
-  approved_by: string | null;
-  notes: string | null;
-  created_at: string | null; // timestamptz
-}
-
-// View: derived urgency / approach-window fields computed off signals.
-// No primary key; read-only. Useful for the mockup's "Act in X days" pill.
-export type ApproachWindowRow = {
-  client_id: string | null;
-  signal_id: string | null;
-  company: string | null;
-  title: string | null;
-  archetype_tier: string | null;
-  priority_tier: string | null;
-  current_confidence: number | null;
-  status: string | null;
-  last_seen: string | null; // date
-  decay_rate: number | null;
-  days_until_stale: number | null; // numeric
-  days_until_expired: number | null; // numeric
-  approach_urgency: string | null; // e.g. "Act this week"
-  optimal_outreach_date: string | null; // date
-}
-
-// Shaped to satisfy supabase-js's GenericSchema (mirrors `supabase gen types`
-// output: tables need Row/Insert/Update/Relationships, views need Row, and the
-// schema needs Functions/Enums/CompositeTypes). The portal only reads, so
-// Insert/Update mirror Row.
-export type UserClientRow = {
-  user_id: string; // uuid, FK to auth.users
-  client_id: string; // text short code, FK to icp_configs.client_id
-  created_at: string | null; // timestamptz
-};
-
-export interface Database {
+export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.5"
+  }
   public: {
     Tables: {
-      user_clients: {
-        Row: UserClientRow;
-        Insert: UserClientRow;
-        Update: Partial<UserClientRow>;
-        Relationships: [];
-      };
-      signals: {
-        Row: SignalRow;
-        Insert: SignalRow;
-        Update: Partial<SignalRow>;
-        Relationships: [];
-      };
+      clients: {
+        Row: {
+          client_code: string | null
+          created_at: string | null
+          domain: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          client_code?: string | null
+          created_at?: string | null
+          domain?: string | null
+          id: string
+          name: string
+        }
+        Update: {
+          client_code?: string | null
+          created_at?: string | null
+          domain?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      contacts: {
+        Row: {
+          client_id: string
+          created_at: string | null
+          email: string | null
+          id: string
+          is_primary: boolean | null
+          linkedin_url: string | null
+          name: string
+          signal_id: string | null
+          title: string | null
+        }
+        Insert: {
+          client_id: string
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          is_primary?: boolean | null
+          linkedin_url?: string | null
+          name: string
+          signal_id?: string | null
+          title?: string | null
+        }
+        Update: {
+          client_id?: string
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          is_primary?: boolean | null
+          linkedin_url?: string | null
+          name?: string
+          signal_id?: string | null
+          title?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contacts_signal_id_fkey"
+            columns: ["signal_id"]
+            isOneToOne: false
+            referencedRelation: "signals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       icp_configs: {
-        Row: IcpConfigRow;
-        Insert: IcpConfigRow;
-        Update: Partial<IcpConfigRow>;
-        Relationships: [];
-      };
+        Row: {
+          client_id: string
+          client_name: string
+          config: Json
+          created_at: string | null
+          domain: string | null
+          id: string
+          locked_at: string | null
+          status: string
+          updated_at: string | null
+          version: number
+        }
+        Insert: {
+          client_id: string
+          client_name: string
+          config?: Json
+          created_at?: string | null
+          domain?: string | null
+          id?: string
+          locked_at?: string | null
+          status?: string
+          updated_at?: string | null
+          version?: number
+        }
+        Update: {
+          client_id?: string
+          client_name?: string
+          config?: Json
+          created_at?: string | null
+          domain?: string | null
+          id?: string
+          locked_at?: string | null
+          status?: string
+          updated_at?: string | null
+          version?: number
+        }
+        Relationships: []
+      }
       scan_runs: {
-        Row: ScanRunRow;
-        Insert: ScanRunRow;
-        Update: Partial<ScanRunRow>;
-        Relationships: [];
-      };
-    };
+        Row: {
+          approved_by: string | null
+          client_id: string
+          created_at: string | null
+          id: string
+          notes: string | null
+          run_date: string
+          signals_decayed: number | null
+          signals_found: number | null
+          signals_new: number | null
+          signals_refreshed: number | null
+          status: string
+          triggered_by: string
+        }
+        Insert: {
+          approved_by?: string | null
+          client_id: string
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          run_date?: string
+          signals_decayed?: number | null
+          signals_found?: number | null
+          signals_new?: number | null
+          signals_refreshed?: number | null
+          status?: string
+          triggered_by?: string
+        }
+        Update: {
+          approved_by?: string | null
+          client_id?: string
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          run_date?: string
+          signals_decayed?: number | null
+          signals_found?: number | null
+          signals_new?: number | null
+          signals_refreshed?: number | null
+          status?: string
+          triggered_by?: string
+        }
+        Relationships: []
+      }
+      signals: {
+        Row: {
+          archetype: string
+          archetype_tier: string
+          boost_flags: string[] | null
+          client_id: string
+          company: string
+          company_domain: string | null
+          company_domain_source: string | null
+          created_at: string | null
+          current_confidence: number
+          decay_rate: number
+          enriched_status: boolean | null
+          expansion_flag: boolean | null
+          first_seen: string
+          id: string
+          initial_confidence: number
+          last_decay_applied: string | null
+          last_seen: string
+          next_step: string | null
+          notes: string | null
+          outreach_angle: string | null
+          priority_tier: string | null
+          scan_count: number
+          signal_id: string
+          source_url: string | null
+          status: string
+          summary: string | null
+          surfaced: boolean | null
+          surfaced_at: string | null
+          target_persona: string | null
+          title: string
+          updated_at: string | null
+          why_now: string | null
+        }
+        Insert: {
+          archetype: string
+          archetype_tier: string
+          boost_flags?: string[] | null
+          client_id: string
+          company: string
+          company_domain?: string | null
+          company_domain_source?: string | null
+          created_at?: string | null
+          current_confidence: number
+          decay_rate?: number
+          enriched_status?: boolean | null
+          expansion_flag?: boolean | null
+          first_seen: string
+          id?: string
+          initial_confidence: number
+          last_decay_applied?: string | null
+          last_seen: string
+          next_step?: string | null
+          notes?: string | null
+          outreach_angle?: string | null
+          priority_tier?: string | null
+          scan_count?: number
+          signal_id: string
+          source_url?: string | null
+          status?: string
+          summary?: string | null
+          surfaced?: boolean | null
+          surfaced_at?: string | null
+          target_persona?: string | null
+          title: string
+          updated_at?: string | null
+          why_now?: string | null
+        }
+        Update: {
+          archetype?: string
+          archetype_tier?: string
+          boost_flags?: string[] | null
+          client_id?: string
+          company?: string
+          company_domain?: string | null
+          company_domain_source?: string | null
+          created_at?: string | null
+          current_confidence?: number
+          decay_rate?: number
+          enriched_status?: boolean | null
+          expansion_flag?: boolean | null
+          first_seen?: string
+          id?: string
+          initial_confidence?: number
+          last_decay_applied?: string | null
+          last_seen?: string
+          next_step?: string | null
+          notes?: string | null
+          outreach_angle?: string | null
+          priority_tier?: string | null
+          scan_count?: number
+          signal_id?: string
+          source_url?: string | null
+          status?: string
+          summary?: string | null
+          surfaced?: boolean | null
+          surfaced_at?: string | null
+          target_persona?: string | null
+          title?: string
+          updated_at?: string | null
+          why_now?: string | null
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          client_id: string
+          created_at: string | null
+          id: string
+          segment_count: number
+          signal_cap: number
+          started_at: string
+          status: string
+          tier: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string | null
+          id?: string
+          segment_count: number
+          signal_cap: number
+          started_at: string
+          status?: string
+          tier: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string | null
+          id?: string
+          segment_count?: number
+          signal_cap?: number
+          started_at?: string
+          status?: string
+          tier?: string
+        }
+        Relationships: []
+      }
+      user_clients: {
+        Row: {
+          client_id: string
+          created_at: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+    }
     Views: {
-      approach_windows: { Row: ApproachWindowRow; Relationships: [] };
-    };
-    Functions: Record<string, never>;
-    Enums: Record<string, never>;
-    CompositeTypes: Record<string, never>;
-  };
+      approach_windows: {
+        Row: {
+          approach_urgency: string | null
+          archetype_tier: string | null
+          client_id: string | null
+          company: string | null
+          current_confidence: number | null
+          days_until_expired: number | null
+          days_until_stale: number | null
+          decay_rate: number | null
+          last_seen: string | null
+          optimal_outreach_date: string | null
+          priority_tier: string | null
+          signal_id: string | null
+          status: string | null
+          title: string | null
+        }
+        Insert: {
+          approach_urgency?: never
+          archetype_tier?: string | null
+          client_id?: string | null
+          company?: string | null
+          current_confidence?: number | null
+          days_until_expired?: never
+          days_until_stale?: never
+          decay_rate?: number | null
+          last_seen?: string | null
+          optimal_outreach_date?: never
+          priority_tier?: string | null
+          signal_id?: string | null
+          status?: string | null
+          title?: string | null
+        }
+        Update: {
+          approach_urgency?: never
+          archetype_tier?: string | null
+          client_id?: string | null
+          company?: string | null
+          current_confidence?: number | null
+          days_until_expired?: never
+          days_until_stale?: never
+          decay_rate?: number | null
+          last_seen?: string | null
+          optimal_outreach_date?: never
+          priority_tier?: string | null
+          signal_id?: string | null
+          status?: string | null
+          title?: string | null
+        }
+        Relationships: []
+      }
+    }
+    Functions: {
+      apply_signal_decay: {
+        Args: never
+        Returns: {
+          client_id: string
+          new_confidence: number
+          new_status: string
+          old_confidence: number
+          old_status: string
+          signal_id: string
+          weeks_since_seen: number
+        }[]
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
 }
+
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
+
+export const Constants = {
+  public: {
+    Enums: {},
+  },
+} as const
