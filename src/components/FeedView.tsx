@@ -41,7 +41,7 @@ export default function FeedView({
         "--accent": ACCENT_HEX[client.accent],
         ...(isH2o && {
           backgroundImage:
-            "radial-gradient(circle, rgba(236,253,149,0.07) 1px, transparent 1px)",
+            "radial-gradient(circle, rgba(236,253,149,0.18) 1px, transparent 1px)",
           backgroundSize: "24px 24px",
         }),
       } as CSSProperties}
