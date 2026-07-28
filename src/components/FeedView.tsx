@@ -37,14 +37,7 @@ export default function FeedView({
   return (
     <div
       className="min-h-screen"
-      style={{
-        "--accent": ACCENT_HEX[client.accent],
-        ...(isH2o && {
-          backgroundImage:
-            "radial-gradient(circle, rgba(236,253,149,0.18) 1px, transparent 1px)",
-          backgroundSize: "24px 24px",
-        }),
-      } as CSSProperties}
+      style={{ "--accent": ACCENT_HEX[client.accent] } as CSSProperties}
     >
       <TopBar client={client} subscriptionTier={planTier} />
       {isH2o ? (
@@ -94,7 +87,22 @@ export default function FeedView({
         <DemoBar tier={tier} basePath={basePath} />
       )}
 
-      <div className="mx-auto max-w-[1180px] px-[26px] pb-[90px] pt-[30px]">
+      <div
+        className="mx-auto max-w-[1180px] px-[26px] pb-[90px] pt-[30px]"
+        style={isH2o ? {
+          backgroundImage:
+            "radial-gradient(circle, rgba(236,253,149,0.15) 1px, transparent 1px)",
+          backgroundSize: "24px 24px",
+          WebkitMaskImage:
+            "linear-gradient(to right, transparent 0, black 40px, black calc(100% - 40px), transparent 100%), " +
+            "linear-gradient(to bottom, transparent 0, black 60px, black calc(100% - 60px), transparent 100%)",
+          maskImage:
+            "linear-gradient(to right, transparent 0, black 40px, black calc(100% - 40px), transparent 100%), " +
+            "linear-gradient(to bottom, transparent 0, black 60px, black calc(100% - 60px), transparent 100%)",
+          WebkitMaskComposite: "source-in",
+          maskComposite: "intersect",
+        } as CSSProperties : undefined}
+      >
         <div className="mb-[8px] flex items-end justify-between gap-[24px] max-md:flex-col max-md:items-start">
           <div className="flex flex-col gap-[7px]">
             <span className="flex items-center gap-[10px] text-[10px] font-bold uppercase tracking-[0.18em] text-lime/70">
