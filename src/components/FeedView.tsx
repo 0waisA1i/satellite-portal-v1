@@ -47,14 +47,8 @@ export default function FeedView({
             backgroundImage:
               "radial-gradient(circle, rgba(236,253,149,0.18) 1px, transparent 1px)",
             backgroundSize: "24px 24px",
-            WebkitMaskImage:
-              "linear-gradient(to bottom, transparent 0px, black 90px, black 100%), " +
-              "radial-gradient(ellipse at 50% 50%, black 45%, transparent 85%)",
-            maskImage:
-              "linear-gradient(to bottom, transparent 0px, black 90px, black 100%), " +
-              "radial-gradient(ellipse at 50% 50%, black 45%, transparent 85%)",
-            WebkitMaskComposite: "source-in",
-            maskComposite: "intersect",
+            WebkitMaskImage: "linear-gradient(to bottom, transparent 0px, black 100px)",
+            maskImage: "linear-gradient(to bottom, transparent 0px, black 100px)",
           } as CSSProperties}
         />
       )}
