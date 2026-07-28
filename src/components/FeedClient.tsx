@@ -292,7 +292,9 @@ export default function FeedClient({
               hideVolume={isKathairos}
             />
           </div>
-          <UpgradeBanner tier={tier} onUpgrade={upgrade} />
+          <div className={isH2o ? "rounded-[14px] bg-black" : undefined}>
+            <UpgradeBanner tier={tier} onUpgrade={upgrade} />
+          </div>
         </>
       )}
 
