@@ -6,6 +6,14 @@ import { getServerSupabase } from "@/lib/supabase";
 import { archetypeLabel } from "@/lib/archetypes";
 import { fetchClientTier } from "@/lib/live";
 
+const ARCHIVE_ALLOWED_CLIENTS = new Set([
+  "h2oallegiant",
+  "kathairos",
+  "gridvest",
+  "cleantechgrowthlab",
+  "ensights",
+]);
+
 // Rows returned for the Contacts sheet in the Excel export.
 // Joined server-side so the client never needs its own Supabase query.
 export interface ExportContactRow {
@@ -88,13 +96,7 @@ export async function fetchContactsForSignal(
 export async function restoreSignalAction(signalUuid: string): Promise<void> {
   const cookieStore = await cookies();
   const clientId = cookieStore.get("satellite_client_id")?.value;
-  if (
-    clientId !== "h2oallegiant" &&
-    clientId !== "kathairos" &&
-    clientId !== "gridvest" &&
-    clientId !== "cleantechgrowthlab" &&
-    clientId !== "ensights"
-  ) return;
+  if (!clientId || !ARCHIVE_ALLOWED_CLIENTS.has(clientId)) return;
 
   const supabase = getServerSupabase();
   const { error } = await supabase
@@ -110,13 +112,7 @@ export async function restoreSignalAction(signalUuid: string): Promise<void> {
 export async function archiveSignalAction(signalUuid: string): Promise<void> {
   const cookieStore = await cookies();
   const clientId = cookieStore.get("satellite_client_id")?.value;
-  if (
-    clientId !== "h2oallegiant" &&
-    clientId !== "kathairos" &&
-    clientId !== "gridvest" &&
-    clientId !== "cleantechgrowthlab" &&
-    clientId !== "ensights"
-  ) return;
+  if (!clientId || !ARCHIVE_ALLOWED_CLIENTS.has(clientId)) return;
 
   const supabase = getServerSupabase();
   const { error } = await supabase

@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { ADMIN_EMAIL } from "@/lib/constants";
 
 // Paths that don't require authentication.
 // /demo is intentionally public so the showcase URL stays accessible without login.
 const PUBLIC_PATHS = ["/login", "/demo"];
 
-const ADMIN_EMAIL = "admin@satellite.com";
-
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // /admin is its own auth domain — admins never have satellite_client_id, so

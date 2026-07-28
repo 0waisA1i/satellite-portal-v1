@@ -3,6 +3,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { getServerSupabase } from "@/lib/supabase";
+import { ADMIN_EMAIL } from "@/lib/constants";
 
 export async function loginAction(
   formData: FormData,
@@ -38,7 +39,7 @@ export async function loginAction(
   cookieStore.set("satellite_user_email", authData.user.email ?? "", cookieOpts);
 
   // Admin bypasses the client lookup entirely and lands on /admin.
-  if (authData.user.email === "admin@satellite.com") {
+  if (authData.user.email === ADMIN_EMAIL) {
     redirect("/admin");
   }
 

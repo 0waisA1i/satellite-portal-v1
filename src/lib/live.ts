@@ -2,7 +2,7 @@ import "server-only";
 import { getServerSupabase } from "./supabase";
 import { archetypeLabel } from "./archetypes";
 import type { Client, Signal, Tier } from "./types";
-import type { ApproachWindowRow, SignalRow } from "./database.types";
+import type { SignalRow } from "./database.types";
 
 // Live read layer: pulls rows from the introspected Supabase schema and maps
 // them onto the UI's Signal shape. This is RENDERING ONLY. Tier gating (cap,
@@ -57,7 +57,7 @@ function firstSentence(text: string): string {
   return s.length > 160 ? `${s.slice(0, 157)}...` : s;
 }
 
-function mapRow(row: SignalRow, window?: ApproachWindowRow): Signal {
+function mapRow(row: SignalRow): Signal {
   const summary = sanitize(row.summary);
   const archetypeName = archetypeLabel(row.archetype);
   // Formula: (current_confidence - 50) / decay_rate * 7
@@ -148,23 +148,15 @@ export async function fetchLiveFeed(clientId?: string): Promise<LiveFeed> {
     accent: "lime", // GAP: no per-client accent column; default brand accent
   };
 
-  const [{ data: rows, error: sigError }, { data: windows }] = await Promise.all([
-    supabase
-      .from("signals")
-      .select("*")
-      .eq("client_id", resolvedClientId)
-      .order("current_confidence", { ascending: false }),
-    supabase.from("approach_windows").select("*").eq("client_id", resolvedClientId),
-  ]);
+  const { data: rows, error: sigError } = await supabase
+    .from("signals")
+    .select("*")
+    .eq("client_id", resolvedClientId)
+    .order("current_confidence", { ascending: false });
   if (sigError) throw new Error(`signals read failed: ${sigError.message}`);
 
-  const windowBySignal = new Map<string, ApproachWindowRow>();
-  for (const w of windows ?? []) {
-    if (w.signal_id) windowBySignal.set(w.signal_id, w);
-  }
-
   const signals = (rows ?? []).map((row) => {
-    const mapped = mapRow(row, windowBySignal.get(row.signal_id));
+    const mapped = mapRow(row);
     mapped.surfaced_period = currentPeriod;
     return mapped;
   });
