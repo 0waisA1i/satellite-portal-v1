@@ -239,6 +239,7 @@ export default function FeedClient({
           return (
             <div
               key={s.signal_id}
+              className={isH2o ? "rounded-[14px] bg-black" : undefined}
               style={{
                 opacity: exiting ? 0 : 1,
                 transform: exiting
