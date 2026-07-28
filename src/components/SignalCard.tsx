@@ -110,27 +110,16 @@ export default function SignalCard({
               </div>
             </div>
             <div className="flex shrink-0 gap-[7px] max-md:w-full max-md:justify-between">
-              {/* outreach-by (h2o: label above date) / deadline chip */}
+              {/* outreach-by / deadline chip — identical layout, label and value differ */}
               <div className="min-w-[66px] rounded-[10px] border border-line bg-white/[0.04] px-[14px] py-[9px] text-center">
-                {isH2o ? (
-                  <>
-                    <span className="block text-[6.5px] font-semibold uppercase tracking-[0.1em] text-txt-3">
-                      Outreach By
-                    </span>
-                    <span className="mt-[4px] block text-[13px] font-bold leading-none tracking-[-0.02em]">
-                      {formatRelativeDeadline(signal.deadline_date, signal.act_within_days)}
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <span className="block text-[18px] font-bold leading-none tracking-[-0.02em]">
-                      {formatDeadline(signal.deadline_date)}
-                    </span>
-                    <span className="mt-[4px] block text-[6.5px] font-semibold uppercase tracking-[0.1em] text-txt-3">
-                      Deadline
-                    </span>
-                  </>
-                )}
+                <span className="block text-[18px] font-bold leading-none tracking-[-0.02em]">
+                  {isH2o
+                    ? formatRelativeDeadline(signal.deadline_date, signal.act_within_days)
+                    : formatDeadline(signal.deadline_date)}
+                </span>
+                <span className="mt-[4px] block text-[6.5px] font-semibold uppercase tracking-[0.1em] text-txt-3">
+                  {isH2o ? "Outreach By" : "Deadline"}
+                </span>
               </div>
               {/* volume chip: hidden for h2o (outreach-by already covers timing) */}
               {!hideVolume && !isH2o && (
