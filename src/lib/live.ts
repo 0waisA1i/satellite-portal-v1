@@ -109,7 +109,7 @@ function mapRow(row: SignalRow, window?: ApproachWindowRow): Signal {
 // Falls back to "command" (no cap) if the row is missing.
 export async function fetchClientTier(clientId: string): Promise<Tier> {
   const supabase = getServerSupabase();
-  const { data } = await (supabase as any)
+  const { data } = await supabase
     .from("subscriptions")
     .select("tier")
     .eq("client_id", clientId)

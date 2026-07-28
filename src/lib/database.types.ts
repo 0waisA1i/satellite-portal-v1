@@ -524,3 +524,10 @@ export const Constants = {
     Enums: {},
   },
 } as const
+
+// Convenience row-type aliases so existing imports keep working.
+export type SignalRow = Tables<"signals">
+export type ApproachWindowRow = Tables<"approach_windows">
+export type IcpConfigRow = Tables<"icp_configs">
+export type ScanRunRow = Tables<"scan_runs">
+export type UserClientRow = Tables<"user_clients">

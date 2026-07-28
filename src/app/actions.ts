@@ -39,17 +39,17 @@ export async function fetchContactsForExport(): Promise<ExportContactRow[] | nul
     .eq("client_id", clientId);
   if (sigError || !signals?.length) return [];
 
-  const sigMap = new Map((signals as any[]).map((s) => [s.id as string, s as any]));
-  const signalIds = (signals as any[]).map((s) => s.id as string);
+  const sigMap = new Map(signals.map((s) => [s.id, s]));
+  const signalIds = signals.map((s) => s.id);
 
-  const { data: contacts, error: conError } = await (supabase as any)
+  const { data: contacts, error: conError } = await supabase
     .from("contacts")
     .select("name, title, email, linkedin_url, signal_id")
     .in("signal_id", signalIds);
   if (conError) throw new Error(`contacts export fetch failed: ${conError.message}`);
 
-  return ((contacts ?? []) as any[]).map((c) => {
-    const sig = sigMap.get(c.signal_id as string);
+  return (contacts ?? []).map((c) => {
+    const sig = sigMap.get(c.signal_id ?? "");
     return {
       company: sig?.company ?? "",
       signal_id: sig?.signal_id ?? "",
@@ -76,12 +76,12 @@ export async function fetchContactsForSignal(
 ): Promise<EnrichedContact[]> {
   const supabase = getServerSupabase();
   const { data, error } = await supabase
-    .from("contacts" as any)
+    .from("contacts")
     .select("id, name, title, email, linkedin_url, is_primary")
     .eq("signal_id", signalUuid)
     .order("is_primary", { ascending: false });
   if (error) throw new Error(`contacts fetch failed: ${error.message}`);
-  return (data ?? []) as unknown as EnrichedContact[];
+  return data ?? [];
 }
 
 // Restores an archived/expired signal back to active. Gated to tab-view clients.

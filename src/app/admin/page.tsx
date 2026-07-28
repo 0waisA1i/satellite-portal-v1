@@ -1,4 +1,3 @@
-// `subscriptions` is not in the live schema yet — queries fall back to "—".
 import { getServerSupabase } from "@/lib/supabase";
 import type { ScanRunRow, SignalRow } from "@/lib/database.types";
 import AdminTopBar from "@/components/AdminTopBar";
@@ -17,8 +16,6 @@ export default async function AdminPage({
   searchParams: Promise<{ client?: string }>;
 }) {
   const supabase = getServerSupabase();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const db = supabase as any;
 
   const { data: rows, error } = await supabase
     .from("icp_configs")
@@ -39,7 +36,7 @@ export default async function AdminPage({
 
   const [subResult, configResult, sigResult, scanResult] = active
     ? await Promise.all([
-        db
+        supabase
           .from("subscriptions")
           .select("tier, signal_cap, segment_count")
           .eq("client_id", active)
