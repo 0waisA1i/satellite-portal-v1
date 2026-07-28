@@ -184,7 +184,7 @@ export default function FeedView({
         <DemoBar tier={tier} basePath={basePath} />
       )}
 
-      <div className="mx-auto max-w-[1180px] px-[26px] pb-[90px] pt-[30px]">
+      <div className={`mx-auto max-w-[1180px] px-[26px] pt-[30px] ${isH2o ? "pb-[32px]" : "pb-[90px]"}`}>
         <div className="mb-[8px] flex items-end justify-between gap-[24px] max-md:flex-col max-md:items-start">
           <div className="flex flex-col gap-[7px]">
             <span className="flex items-center gap-[10px] text-[10px] font-bold uppercase tracking-[0.18em] text-lime/70">
