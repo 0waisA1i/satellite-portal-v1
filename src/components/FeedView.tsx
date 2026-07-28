@@ -6,6 +6,7 @@ import ExportCsvButton from "@/components/ExportCsvButton";
 import FeedClient from "@/components/FeedClient";
 import TopBar from "@/components/TopBar";
 import { ACCENT_HEX, formatPeriod } from "@/lib/archetypes";
+import { getClientConfig } from "@/lib/constants";
 
 // Shared Signal Satellite layout rendered by both routes: the live feed at "/"
 // and the always-sample feed at "/demo". `basePath` keeps the demo controls and
@@ -27,12 +28,9 @@ export default function FeedView({
   isDemo?: boolean;
 }) {
   const { client, subscription, signals, stats } = feed;
-  const isH2o = client.id === "h2oallegiant";
-  const usesTabView =
-    client.id === "kathairos" ||
-    client.id === "gridvest" ||
-    client.id === "cleantechgrowthlab" ||
-    client.id === "ensights";
+  const cfg = getClientConfig(client.id);
+  const isH2o = cfg.isH2o;
+  const usesTabView = cfg.usesTwoTabView;
   const isHistorical = view === "historical";
   const planTier = subscriptionTier ?? tier;
 

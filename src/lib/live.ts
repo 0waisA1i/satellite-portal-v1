@@ -73,51 +73,53 @@ function mapRow(row: SignalRow): Signal {
     archetype: archetypeName,
     account: {
       name: sanitize(row.company),
-      sector: "", // GAP: sector lives at ICP level, not per signal
-      geo: "", // GAP: geo lives at ICP level, not per signal
+      sector: "", // TODO: add sector/geo columns to signals table (currently only in icp_configs.config)
+      geo: "",
     },
     title: sanitize(row.title),
-    // GAP: no trigger_label column. Surface the real tier metadata instead.
+    // TODO: add trigger_label column to signals; for now derive from archetype_tier + priority_tier
     trigger_label: [row.archetype_tier, row.priority_tier]
       .filter(Boolean)
       .join(" · "),
     why_now: row.why_now ?? "",
     summary,
-    signal_intelligence: summary, // GAP: no dedicated field; reuse summary
+    signal_intelligence: summary, // TODO: add signal_intelligence column to signals table
     suggested_next_step: sanitize(row.next_step),
     target_titles: parseTargetTitles(row.target_persona),
     outreach_angle: row.outreach_angle ?? "",
-    false_positive_filter: "", // GAP: lives in icp_configs.config, not per signal
+    false_positive_filter: "", // TODO: pull from icp_configs.config.false_positive_filters per signal archetype
     rank_boost_flags: row.boost_flags ?? [],
     confidence_current: row.current_confidence,
     // Always anchor to last_seen. The h2o "Outreach By" chip adds act_within_days
     // as an offset; other clients display this as an absolute date ("Last Seen").
     deadline_date: row.last_seen,
     act_within_days: actWithin,
-    est_volume: "", // GAP: no volume column
+    est_volume: "", // TODO: add est_volume column to signals table (pipeline stage 7 output)
     status: (row.status as Signal["status"]) ?? "active",
     source_url: row.source_url ?? "",
-    source_verified: false, // GAP: no source_verified column
-    surfaced: true, // GAP: no surfaced flag; treat all as surfaced
+    source_verified: false, // TODO: add source_verified boolean column to signals table
+    surfaced: true, // TODO: use signals.surfaced column once pipeline sets it reliably
     surfaced_period: "", // set by caller to the current period
-    contacts: [], // GAP: no contacts table; enrichment not wired
+    contacts: [], // TODO: wire enrichment — query contacts table via fetchContactsForSignal
   };
 }
 
-// Reads the client's real subscription tier from the subscriptions table.
-// DB stores "signal_feed" | "signal_stack" | "signal_command"; maps to app Tier.
-// Falls back to "command" (no cap) if the row is missing.
-export async function fetchClientTier(clientId: string): Promise<Tier> {
+// Reads tier and signal_cap from the subscriptions table. Falls back to preset
+// caps when the DB row is missing so the app stays functional without a row.
+const FALLBACK_SIGNAL_CAPS: Record<Tier, number> = { feed: 5, stack: 15, command: Infinity };
+
+export async function fetchClientTier(
+  clientId: string,
+): Promise<{ tier: Tier; signal_cap: number }> {
   const supabase = getServerSupabase();
   const { data } = await supabase
     .from("subscriptions")
-    .select("tier")
+    .select("tier, signal_cap")
     .eq("client_id", clientId)
     .maybeSingle();
   const t: string = data?.tier ?? "";
-  if (t === "signal_feed") return "feed";
-  if (t === "signal_stack") return "stack";
-  return "command";
+  const tier: Tier = t === "signal_feed" ? "feed" : t === "signal_stack" ? "stack" : "command";
+  return { tier, signal_cap: data?.signal_cap ?? FALLBACK_SIGNAL_CAPS[tier] };
 }
 
 export interface LiveFeed {
@@ -145,7 +147,7 @@ export async function fetchLiveFeed(clientId?: string): Promise<LiveFeed> {
     id: resolvedClientId,
     name: icp.client_name,
     code: resolvedClientId.slice(0, 3).toUpperCase(),
-    accent: "lime", // GAP: no per-client accent column; default brand accent
+    accent: "lime", // TODO: add accent column to clients table (or icp_configs)
   };
 
   const { data: rows, error: sigError } = await supabase

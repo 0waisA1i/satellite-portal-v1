@@ -4,6 +4,7 @@ import { useCallback, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { GatedFeed, Subscription, Tier, VisibleSignal } from "@/lib/types";
 import { ACCENT_SEQUENCE } from "@/lib/archetypes";
+import { getClientConfig } from "@/lib/constants";
 import { archiveSignalAction, restoreSignalAction } from "@/app/actions";
 import DetailSheet, { type SheetMode } from "./DetailSheet";
 import EnrichPanel from "./EnrichPanel";
@@ -217,17 +218,9 @@ export default function FeedClient({
   };
 
   const { tier } = feed.subscription;
-  const isKathairos = feed.client.id === "kathairos";
-  const isH2o = feed.client.id === "h2oallegiant";
-  const isEnsights = feed.client.id === "ensights";
-  // Active/Historical tab-view clients (h2oallegiant excluded — it uses tier tabs)
-  const usesTabView =
-    feed.client.id === "kathairos" ||
-    feed.client.id === "gridvest" ||
-    feed.client.id === "cleantechgrowthlab" ||
-    feed.client.id === "ensights";
-  // Archive/Restore apply to h2oallegiant AND all tab-view clients
-  const hasArchiveFeature = isH2o || usesTabView;
+  const cfg = getClientConfig(feed.client.id);
+  const { isKathairos, isH2o, isEnsights, hasArchiveFeature, hasArchetypeStrip } = cfg;
+  const usesTabView = cfg.usesTwoTabView;
   const isHistorical = view === "historical";
 
   // Always exactly 1 teaser card; fall back to a placeholder if real teasers
@@ -237,7 +230,7 @@ export default function FeedClient({
 
   return (
     <>
-      {usesTabView && <ArchetypeStrip signals={feed.signals} />}
+      {hasArchetypeStrip && <ArchetypeStrip signals={feed.signals} />}
 
       <div className="flex flex-col gap-[14px]">
         {feed.signals.map((s) => {

@@ -186,14 +186,15 @@ export async function getHistoricalFeed(
 // `clientId` scopes the live read to a specific client (set from the auth cookie).
 export async function getGatedFeed(
   tier: Tier,
-  opts: { source?: "auto" | "demo"; clientId?: string } = {},
+  opts: { source?: "auto" | "demo"; clientId?: string; signal_cap?: number } = {},
 ): Promise<GatedFeed> {
-  const { source = "auto", clientId } = opts;
+  const { source = "auto", clientId, signal_cap } = opts;
 
   if (source === "auto" && hasSupabaseEnv) {
     const { client, signals, currentPeriod } = await fetchLiveFeed(clientId);
     const subscription: Subscription = {
       ...TIER_PRESETS[tier],
+      ...(signal_cap !== undefined && { signal_cap }),
       current_period: currentPeriod,
     };
     return gate(client, signals, subscription);

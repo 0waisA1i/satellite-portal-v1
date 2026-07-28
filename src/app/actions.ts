@@ -5,14 +5,7 @@ import { redirect } from "next/navigation";
 import { getServerSupabase } from "@/lib/supabase";
 import { archetypeLabel } from "@/lib/archetypes";
 import { fetchClientTier } from "@/lib/live";
-
-const ARCHIVE_ALLOWED_CLIENTS = new Set([
-  "h2oallegiant",
-  "kathairos",
-  "gridvest",
-  "cleantechgrowthlab",
-  "ensights",
-]);
+import { getClientConfig } from "@/lib/constants";
 
 // Rows returned for the Contacts sheet in the Excel export.
 // Joined server-side so the client never needs its own Supabase query.
@@ -35,7 +28,7 @@ export async function fetchContactsForExport(): Promise<ExportContactRow[] | nul
   if (!clientId) return null;
 
   // signal_feed clients (e.g. Kathairos) do not get a Contacts tab.
-  const tier = await fetchClientTier(clientId);
+  const { tier } = await fetchClientTier(clientId);
   if (tier === "feed") return null;
 
   const supabase = getServerSupabase();
@@ -96,7 +89,7 @@ export async function fetchContactsForSignal(
 export async function restoreSignalAction(signalUuid: string): Promise<void> {
   const cookieStore = await cookies();
   const clientId = cookieStore.get("satellite_client_id")?.value;
-  if (!clientId || !ARCHIVE_ALLOWED_CLIENTS.has(clientId)) return;
+  if (!clientId || !getClientConfig(clientId).hasArchiveFeature) return;
 
   const supabase = getServerSupabase();
   const { error } = await supabase
@@ -112,7 +105,7 @@ export async function restoreSignalAction(signalUuid: string): Promise<void> {
 export async function archiveSignalAction(signalUuid: string): Promise<void> {
   const cookieStore = await cookies();
   const clientId = cookieStore.get("satellite_client_id")?.value;
-  if (!clientId || !ARCHIVE_ALLOWED_CLIENTS.has(clientId)) return;
+  if (!clientId || !getClientConfig(clientId).hasArchiveFeature) return;
 
   const supabase = getServerSupabase();
   const { error } = await supabase
