@@ -17,44 +17,76 @@ function LinkedinIcon({ className }: { className?: string }) {
   );
 }
 
-function H2oFooter() {
-  const linkCls =
-    "text-white/40 transition hover:text-white/70";
+function CtglLogo() {
   return (
-    <footer className="relative z-[1] border-t border-white/[0.06] bg-[#000000] px-[26px] py-[18px]">
-      <div className="mx-auto flex max-w-[1180px] items-center justify-between gap-[16px]">
-        <div className="flex items-center gap-[18px]">
-          <a
-            href="https://www.linkedin.com/company/cleantech-growthlab"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="LinkedIn"
-            className={linkCls}
-          >
-            <LinkedinIcon className="h-[15px] w-[15px]" />
-          </a>
-          <a
-            href="https://cleantechgrowthlab.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Website"
-            className={linkCls}
-          >
-            <Globe className="h-[15px] w-[15px]" />
-          </a>
-          <a
-            href="mailto:eben@cleantechgrowthlab.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Email"
-            className={linkCls}
-          >
-            <Mail className="h-[15px] w-[15px]" />
-          </a>
+    <svg viewBox="0 0 44 44" fill="none" className="h-[32px] w-[32px]">
+      <g clipPath="url(#ctgl-c0)">
+        <path d="M21.95 43.48C34.07 43.48 43.9 33.88 43.9 22.03 43.9 10.19 34.07.59 21.95.59 9.83.59.01 10.19.01 22.03.01 33.88 9.83 43.48 21.95 43.48Z" fill="#fff" />
+        <path d="M32.16 12.82c2.04-1.33-24.78-2.25-19.95 15.95 1.55-3.27 4.16-4.98 6.2-7.24.36-.4-3.92 1.14-3.56.78 2.5-3.68 10.17-6.8 8.72-5.79-1.45 1.01-2.88 1.88-3.6 3.32-.65.77 3.55-.96 3.01-.36-3.45 1.91-6.79 7.68-7.42 12.43h1.4s8.12-.56 10.96-6.01c2.83-5.45 2.2-11.74 4.24-13.07Z" fill="#000" />
+      </g>
+      <defs>
+        <clipPath id="ctgl-c0">
+          <rect width="44" height="43" fill="#fff" transform="translate(0 .5)" />
+        </clipPath>
+      </defs>
+    </svg>
+  );
+}
+
+function H2oFooter() {
+  const iconLinkCls =
+    "flex items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.03] p-[9px] text-white/40 transition hover:border-white/20 hover:bg-white/[0.06] hover:text-white/80";
+  return (
+    <footer className="relative z-[1] bg-[#000000]">
+      <div className="mx-auto max-w-[1180px] px-[26px]">
+        <div className="h-px bg-white/[0.07]" />
+        <div className="flex items-center justify-between gap-[24px] py-[28px] max-md:flex-col max-md:items-start">
+          <div className="flex items-center gap-[12px]">
+            <CtglLogo />
+            <div>
+              <div className="text-[15px] font-bold leading-tight tracking-[-0.01em]">
+                CleanTech GrowthLab
+              </div>
+              <div className="mt-[2px] text-[10px] tracking-[0.06em] text-white/30">
+                Satellite Client Portal
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-col items-end gap-[12px] max-md:items-start">
+            <div className="flex items-center gap-[8px]">
+              <a
+                href="https://www.linkedin.com/company/cleantech-growthlab"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="LinkedIn"
+                className={iconLinkCls}
+              >
+                <LinkedinIcon className="h-[14px] w-[14px]" />
+              </a>
+              <a
+                href="https://cleantechgrowthlab.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Website"
+                className={iconLinkCls}
+              >
+                <Globe className="h-[14px] w-[14px]" />
+              </a>
+              <a
+                href="mailto:eben@cleantechgrowthlab.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Email"
+                className={iconLinkCls}
+              >
+                <Mail className="h-[14px] w-[14px]" />
+              </a>
+            </div>
+            <span className="text-[10px] tracking-[0.03em] text-white/25">
+              Powered by Satellite · CleanTech GrowthLab
+            </span>
+          </div>
         </div>
-        <span className="text-[10.5px] tracking-[0.02em] text-white/30">
-          Powered by Satellite · CleanTech GrowthLab
-        </span>
       </div>
     </footer>
   );
