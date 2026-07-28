@@ -57,7 +57,7 @@ export default function FeedView({
       <TopBar client={client} subscriptionTier={planTier} />
       {isH2o ? (
         // h2oallegiant: tier tabs (Feed/Stack/Command) + Historical link, no demo label
-        <div className="flex items-center justify-center border-b border-line bg-black px-[26px] py-[9px]">
+        <div className="relative z-[1] flex items-center justify-center border-b border-line bg-[#000000] px-[26px] py-[9px]">
           <div className="flex gap-[2px] rounded-[10px] border border-line bg-panel p-[3px]">
             {(["feed", "stack", "command"] as const).map((t) => (
               <Link
