@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import Link from "next/link";
+import { Globe, Mail } from "lucide-react";
 import type { GatedFeed, Tier } from "@/lib/types";
 import DemoBar from "@/components/DemoBar";
 import ExportCsvButton from "@/components/ExportCsvButton";
@@ -7,6 +8,57 @@ import FeedClient from "@/components/FeedClient";
 import TopBar from "@/components/TopBar";
 import { ACCENT_HEX, formatPeriod } from "@/lib/archetypes";
 import { getClientConfig } from "@/lib/constants";
+
+function LinkedinIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+    </svg>
+  );
+}
+
+function H2oFooter() {
+  const linkCls =
+    "text-white/40 transition hover:text-white/70";
+  return (
+    <footer className="relative z-[1] border-t border-white/[0.06] bg-[#000000] px-[26px] py-[18px]">
+      <div className="mx-auto flex max-w-[1180px] items-center justify-between gap-[16px]">
+        <div className="flex items-center gap-[18px]">
+          <a
+            href="https://www.linkedin.com/company/cleantech-growthlab"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="LinkedIn"
+            className={linkCls}
+          >
+            <LinkedinIcon className="h-[15px] w-[15px]" />
+          </a>
+          <a
+            href="https://cleantechgrowthlab.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Website"
+            className={linkCls}
+          >
+            <Globe className="h-[15px] w-[15px]" />
+          </a>
+          <a
+            href="mailto:eben@cleantechgrowthlab.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Email"
+            className={linkCls}
+          >
+            <Mail className="h-[15px] w-[15px]" />
+          </a>
+        </div>
+        <span className="text-[10.5px] tracking-[0.02em] text-white/30">
+          Powered by Satellite · CleanTech GrowthLab
+        </span>
+      </div>
+    </footer>
+  );
+}
 
 // Shared Signal Satellite layout rendered by both routes: the live feed at "/"
 // and the always-sample feed at "/demo". `basePath` keeps the demo controls and
@@ -162,6 +214,8 @@ export default function FeedView({
 
         <FeedClient feed={feed} view={view} basePath={basePath} />
       </div>
+
+      {isH2o && <H2oFooter />}
     </div>
   );
 }
