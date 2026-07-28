@@ -97,7 +97,7 @@ export default function SignalCard({
                   ? [signal.account.sector, signal.account.geo].filter(Boolean).join(" · ")
                   : `${signal.account.sector} · ${signal.account.geo}`}
               </div>
-              <div className="mt-[11px] flex flex-wrap items-center gap-[9px]">
+              <div className={`mt-[11px] flex gap-[9px] ${isH2o ? "flex-col items-start" : "flex-wrap items-center"}`}>
                 <span className="rounded-full border border-line-2 bg-panel px-[10px] py-[3px] text-[9.5px] font-semibold uppercase tracking-[0.05em] text-txt-2">
                   {signal.trigger_label}
                 </span>
