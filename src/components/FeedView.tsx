@@ -120,7 +120,7 @@ export default function FeedView({
 
   return (
     <div
-      className="min-h-screen"
+      className={`min-h-screen ${isH2o ? "flex flex-col" : ""}`}
       style={{ "--accent": ACCENT_HEX[client.accent] } as CSSProperties}
     >
       {isH2o && (
@@ -184,11 +184,11 @@ export default function FeedView({
         <DemoBar tier={tier} basePath={basePath} />
       )}
 
-      <div className={`mx-auto max-w-[1180px] px-[26px] pt-[30px] ${isH2o ? "pb-[32px]" : "pb-[90px]"}`}>
+      <div className={`mx-auto max-w-[1180px] px-[26px] pt-[30px] ${isH2o ? "pb-[32px] flex-1" : "pb-[90px]"}`}>
         <div className="mb-[8px] flex items-end justify-between gap-[24px] max-md:flex-col max-md:items-start">
-          <div className="flex flex-col gap-[7px]">
+          <div className="flex shrink-0 flex-col gap-[7px]">
             <span className="flex items-center gap-[10px] text-[10px] font-bold uppercase tracking-[0.18em] text-lime/70">
-              Signal Satellite · {formatPeriod(subscription.current_period)}
+              Signal Satellite · {isH2o && isHistorical ? "Archived" : formatPeriod(subscription.current_period)}
               {isDemo && (
                 <span className="rounded-full border border-line-2 bg-panel px-[8px] py-[2px] text-[8.5px] tracking-[0.12em] text-txt-3">
                   Demo data
@@ -197,15 +197,16 @@ export default function FeedView({
             </span>
             <h1 className="text-[34px] font-semibold leading-none tracking-[-0.025em]">
               This month&apos;s{" "}
-              <em className="font-serif italic text-accent">buying signals</em>
+              <em className="font-serif italic text-accent">{isH2o && isHistorical ? "worked signals" : "buying signals"}</em>
             </h1>
             <p className="max-w-[560px] text-[13.5px] leading-[1.5] text-txt-3">
-              Named accounts with live timing triggers, scored and surfaced for
-              your segment. Each signal is one account, one reason to act now.
+              {isH2o && isHistorical
+                ? "Signals you've actioned and moved to history. Each one represents an account you've engaged or deprioritised."
+                : "Named accounts with live timing triggers, scored and surfaced for your segment. Each signal is one account, one reason to act now."}
             </p>
           </div>
-          <div className="flex gap-[10px] max-md:w-full max-md:justify-between">
-            <div className="min-w-[84px] rounded-[11px] border border-line bg-panel px-[16px] py-[11px] text-center">
+          <div className="flex shrink-0 gap-[10px] max-md:w-full max-md:justify-between">
+            <div className="min-w-[84px] min-h-[72px] rounded-[11px] border border-line bg-panel px-[16px] py-[11px] text-center">
               <span className="block text-[23px] font-bold leading-none tracking-[-0.02em]">
                 {stats.total}
               </span>
@@ -213,15 +214,15 @@ export default function FeedView({
                 Signals
               </span>
             </div>
-            <div className="min-w-[84px] rounded-[11px] border border-line bg-panel px-[16px] py-[11px] text-center">
+            <div className="min-w-[84px] min-h-[72px] rounded-[11px] border border-line bg-panel px-[16px] py-[11px] text-center">
               <span className="block text-[23px] font-bold leading-none tracking-[-0.02em] text-accent">
                 {stats.active}
               </span>
               <span className="mt-[5px] block text-[7.5px] font-semibold uppercase tracking-[0.1em] text-txt-3">
-                Active
+                {isH2o && isHistorical ? "Archived" : "Active"}
               </span>
             </div>
-            <div className="min-w-[84px] rounded-[11px] border border-line bg-panel px-[16px] py-[11px] text-center">
+            <div className="min-w-[84px] min-h-[72px] rounded-[11px] border border-line bg-panel px-[16px] py-[11px] text-center">
               <span className="block text-[23px] font-bold leading-none tracking-[-0.02em]">
                 <em className="font-serif text-[19px] italic text-accent">
                   {stats.avgConfidence}
@@ -236,7 +237,9 @@ export default function FeedView({
 
         <div className="mb-[16px] mt-[24px] flex items-center gap-[10px]">
           <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-txt-3">
-            {isHistorical ? `Historical signals · ${signals.length}` : `Surfaced this period · ${signals.length}`}
+            {isHistorical
+            ? (isH2o ? `Archived signals · ${signals.length}` : `Historical signals · ${signals.length}`)
+            : `Surfaced this period · ${signals.length}`}
           </span>
           <span className="h-px flex-1 bg-line" />
           {!isHistorical && (
