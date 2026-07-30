@@ -233,6 +233,8 @@ export default function DetailSheet({
                   </Sec>
                   <Sec num="6" title="Signal facts">
                     <dl className="grid grid-cols-[130px_1fr] gap-x-[16px] gap-y-[8px] text-[12.5px]">
+                      <dt className="font-semibold text-txt-3">Signal Date</dt>
+                      <dd>{signal.first_seen ? new Date(signal.first_seen).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "—"}</dd>
                       <dt className="font-semibold text-txt-3">Signal ID</dt>
                       <dd>{signal.signal_id}</dd>
                       <dt className="font-semibold text-txt-3">Trigger</dt>
@@ -245,18 +247,7 @@ export default function DetailSheet({
                       <dd>{signal.act_within_days} days</dd>
                       <dt className="font-semibold text-txt-3">{isH2o ? "Outreach By" : "Deadline"}</dt>
                       <dd>{isH2o ? formatRelativeDeadline(signal.deadline_date, signal.act_within_days) : signal.deadline_date}</dd>
-                      <dt className="font-semibold text-txt-3">Est. volume</dt>
-                      <dd>{signal.est_volume}</dd>
                     </dl>
-                    <div className="mt-[8px] h-[7px] overflow-hidden rounded-full bg-white/[0.08]">
-                      <span
-                        className="block h-full rounded-full"
-                        style={{
-                          width: `${signal.confidence_current}%`,
-                          background: accent,
-                        }}
-                      />
-                    </div>
                   </Sec>
                   <Sec num="7" title="Rank-boost flags">
                     <div className="flex flex-wrap gap-[6px]">

@@ -98,6 +98,7 @@ function mapRow(row: SignalRow): Signal {
     status: (row.status as Signal["status"]) ?? "active",
     source_url: row.source_url ?? "",
     source_verified: false, // TODO: add source_verified boolean column to signals table
+    first_seen: row.first_seen ?? undefined,
     surfaced: true, // TODO: use signals.surfaced column once pipeline sets it reliably
     surfaced_period: "", // set by caller to the current period
     contacts: [], // TODO: wire enrichment — query contacts table via fetchContactsForSignal

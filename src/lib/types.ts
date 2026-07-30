@@ -58,6 +58,7 @@ export interface Signal {
   status: "active" | "stale" | "expired" | "archived";
   source_url: string;
   source_verified: boolean;
+  first_seen?: string;
   surfaced: boolean;
   surfaced_period: string;
   contacts: Contact[];
