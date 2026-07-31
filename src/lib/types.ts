@@ -59,7 +59,7 @@ export interface Signal {
   source_url: string;
   source_verified: boolean;
   first_seen?: string;
-  surfaced: boolean;
+  surfaced_at: string | null;  // date signal was surfaced; null = not yet surfaced
   surfaced_period: string;
   contacts: Contact[];
 }

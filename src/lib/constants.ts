@@ -23,7 +23,7 @@ export const CLIENT_CONFIG: Record<string, ClientConfig> = {
     ...DEFAULT_CLIENT_CONFIG,
     isH2o: true,
     hasArchiveFeature: true,
-    hasArchetypeStrip: true,
+    hasArchetypeStrip: false,
   },
   kathairos: {
     ...DEFAULT_CLIENT_CONFIG,

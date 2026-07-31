@@ -184,9 +184,9 @@ export default function FeedView({
         <DemoBar tier={tier} basePath={basePath} />
       )}
 
-      <div className={`mx-auto max-w-[1180px] px-[26px] pt-[30px] ${isH2o ? "pb-[32px] flex-1" : "pb-[90px]"}`}>
-        <div className="mb-[8px] flex items-end justify-between gap-[24px] max-md:flex-col max-md:items-start">
-          <div className="flex shrink-0 flex-col gap-[7px]">
+      <div className={`mx-auto w-full max-w-[1180px] px-[26px] pt-[30px] ${isH2o ? "pb-[32px] flex-1" : "pb-[90px]"}`}>
+        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', width: '100%', minHeight: '140px', marginBottom: '8px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '7px', flex: 1 }}>
             <span className="flex items-center gap-[10px] text-[10px] font-bold uppercase tracking-[0.18em] text-lime/70">
               Signal Satellite · {isH2o && isHistorical ? "Archived" : formatPeriod(subscription.current_period)}
               {isDemo && (
@@ -199,38 +199,26 @@ export default function FeedView({
               This month&apos;s{" "}
               <em className="font-serif italic text-accent">{isH2o && isHistorical ? "worked signals" : "buying signals"}</em>
             </h1>
-            <p className="max-w-[560px] text-[13.5px] leading-[1.5] text-txt-3">
+            <p className="text-[13.5px] leading-[1.5] text-txt-3" style={{ maxWidth: '560px' }}>
               {isH2o && isHistorical
                 ? "Signals you've actioned and moved to history. Each one represents an account you've engaged or deprioritised."
                 : "Named accounts with live timing triggers, scored and surfaced for your segment. Each signal is one account, one reason to act now."}
             </p>
           </div>
-          <div className="flex shrink-0 gap-[10px] max-md:w-full max-md:justify-between">
-            <div className="min-w-[84px] min-h-[72px] rounded-[11px] border border-line bg-panel px-[16px] py-[11px] text-center">
-              <span className="block text-[23px] font-bold leading-none tracking-[-0.02em]">
-                {stats.total}
-              </span>
-              <span className="mt-[5px] block text-[7.5px] font-semibold uppercase tracking-[0.1em] text-txt-3">
-                Signals
-              </span>
+          <div style={{ display: 'flex', flexShrink: 0, gap: '10px' }}>
+            <div className="rounded-[11px] border border-line bg-panel px-[16px] py-[11px] text-center" style={{ minWidth: '84px', minHeight: '72px' }}>
+              <span className="block text-[23px] font-bold leading-none tracking-[-0.02em]">{stats.total}</span>
+              <span className="mt-[5px] block text-[7.5px] font-semibold uppercase tracking-[0.1em] text-txt-3">Signals</span>
             </div>
-            <div className="min-w-[84px] min-h-[72px] rounded-[11px] border border-line bg-panel px-[16px] py-[11px] text-center">
-              <span className="block text-[23px] font-bold leading-none tracking-[-0.02em] text-accent">
-                {stats.active}
-              </span>
-              <span className="mt-[5px] block text-[7.5px] font-semibold uppercase tracking-[0.1em] text-txt-3">
-                {isH2o && isHistorical ? "Archived" : "Active"}
-              </span>
+            <div className="rounded-[11px] border border-line bg-panel px-[16px] py-[11px] text-center" style={{ minWidth: '84px', minHeight: '72px' }}>
+              <span className="block text-[23px] font-bold leading-none tracking-[-0.02em] text-accent">{stats.active}</span>
+              <span className="mt-[5px] block text-[7.5px] font-semibold uppercase tracking-[0.1em] text-txt-3">{isH2o && isHistorical ? "Archived" : "Active"}</span>
             </div>
-            <div className="min-w-[84px] min-h-[72px] rounded-[11px] border border-line bg-panel px-[16px] py-[11px] text-center">
+            <div className="rounded-[11px] border border-line bg-panel px-[16px] py-[11px] text-center" style={{ minWidth: '84px', minHeight: '72px' }}>
               <span className="block text-[23px] font-bold leading-none tracking-[-0.02em]">
-                <em className="font-serif text-[19px] italic text-accent">
-                  {stats.avgConfidence}
-                </em>
+                <em className="font-serif text-[19px] italic text-accent">{stats.avgConfidence}</em>
               </span>
-              <span className="mt-[5px] block text-[7.5px] font-semibold uppercase tracking-[0.1em] text-txt-3">
-                Avg conf
-              </span>
+              <span className="mt-[5px] block text-[7.5px] font-semibold uppercase tracking-[0.1em] text-txt-3">Avg conf</span>
             </div>
           </div>
         </div>
