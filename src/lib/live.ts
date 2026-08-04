@@ -100,6 +100,8 @@ function mapRow(row: SignalRow): Signal {
     source_verified: false, // TODO: add source_verified boolean column to signals table
     first_seen: row.first_seen ?? undefined,
     surfaced_at: row.surfaced_at ?? null,
+    enrichment_grade: row.enrichment_grade ?? null,
+    send_date: row.send_date ?? null,
     surfaced_period: "", // set by caller to the current period
     contacts: [], // TODO: wire enrichment — query contacts table via fetchContactsForSignal
   };

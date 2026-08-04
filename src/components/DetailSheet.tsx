@@ -247,6 +247,10 @@ export default function DetailSheet({
                       <dd>{signal.act_within_days} days</dd>
                       <dt className="font-semibold text-txt-3">{isH2o ? "Outreach By" : "Deadline"}</dt>
                       <dd>{isH2o ? formatRelativeDeadline(signal.deadline_date, signal.act_within_days) : signal.deadline_date}</dd>
+                      <dt className="font-semibold text-txt-3">Send Date</dt>
+                      <dd>{signal.send_date ? new Date(signal.send_date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "—"}</dd>
+                      <dt className="font-semibold text-txt-3">Grade</dt>
+                      <dd>{signal.enrichment_grade ?? "—"}</dd>
                     </dl>
                   </Sec>
                   <Sec num="7" title="Rank-boost flags">
@@ -263,10 +267,14 @@ export default function DetailSheet({
                   </Sec>
                   <Sec num="8" title="False-positive filter" last>
                     <div className="text-[13.5px] leading-[1.6] text-txt-2">
-                      <span className="text-[10px] font-bold uppercase tracking-[0.08em] text-alert">
-                        Suppressed →{" "}
-                      </span>
-                      {signal.false_positive_filter}
+                      {signal.false_positive_filter ? (
+                        <>
+                          <span className="text-[10px] font-bold uppercase tracking-[0.08em] text-alert">
+                            Suppressed →{" "}
+                          </span>
+                          {signal.false_positive_filter}
+                        </>
+                      ) : "—"}
                     </div>
                   </Sec>
                 </>

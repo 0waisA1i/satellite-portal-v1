@@ -142,7 +142,7 @@ function gateHistorical(
     teaserSignals: [],
     stats: {
       total: historical.length,
-      active: 0,
+      active: historical.length,
       avgConfidence: Math.round(
         historical.reduce((a, s) => a + s.confidence_current, 0) /
           Math.max(historical.length, 1),

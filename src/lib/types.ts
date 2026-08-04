@@ -61,6 +61,8 @@ export interface Signal {
   first_seen?: string;
   surfaced_at: string | null;  // date signal was surfaced; null = not yet surfaced
   surfaced_period: string;
+  enrichment_grade?: string | null;
+  send_date?: string | null;
   contacts: Contact[];
 }
 

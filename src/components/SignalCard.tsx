@@ -89,18 +89,36 @@ export default function SignalCard({
           {/* top: account + stat chips */}
           <div className="flex items-start justify-between gap-[18px] max-md:flex-col">
             <div className="min-w-0 flex-1">
-              <div className={`text-[20px] font-semibold leading-[1.15] tracking-[-0.015em] ${isH2o ? "break-words" : ""}`}>
+              <div className="text-[20px] font-semibold leading-[1.15] tracking-[-0.015em] break-words">
                 {signal.account.name}
               </div>
-              <div className="mt-[3px] text-[12.5px] leading-[1.4] text-txt-2">
-                {isH2o
-                  ? [signal.account.sector, signal.account.geo].filter(Boolean).join(" · ")
-                  : `${signal.account.sector} · ${signal.account.geo}`}
-              </div>
-              <div className={`mt-[11px] flex gap-[9px] ${isH2o ? "flex-col items-start" : "flex-wrap items-center"}`}>
+              {(() => {
+                const subtitle = [signal.account.sector, signal.account.geo].filter(Boolean).join(" · ");
+                return subtitle ? (
+                  <div className="mt-[3px] text-[12.5px] leading-[1.4] text-txt-2">{subtitle}</div>
+                ) : null;
+              })()}
+              <div className="mt-[11px] flex flex-col items-start gap-[9px]">
                 <span className="rounded-full border border-line-2 bg-panel px-[10px] py-[3px] text-[9.5px] font-semibold uppercase tracking-[0.05em] text-txt-2">
                   {signal.trigger_label}
                 </span>
+                {signal.enrichment_grade && (() => {
+                  const g = signal.enrichment_grade;
+                  const style =
+                    g === "STRONG" ? { color: "#CBF3BA", borderColor: "#CBF3BA40", background: "#CBF3BA0d" } :
+                    g === "PARTIAL" ? { color: "#FCD34D", borderColor: "#FCD34D40", background: "#FCD34D0d" } :
+                    g === "THIN"    ? { color: "#FB923C", borderColor: "#FB923C40", background: "#FB923C0d" } :
+                    g === "GATE"    ? { color: "#FF8585", borderColor: "#FF858540", background: "#FF85850d" } :
+                    null;
+                  return style ? (
+                    <span
+                      className="rounded-full border px-[10px] py-[3px] text-[9.5px] font-semibold uppercase tracking-[0.05em]"
+                      style={style}
+                    >
+                      {g}
+                    </span>
+                  ) : null;
+                })()}
                 <span className="text-[9.5px] text-txt-3">
                   <b className="font-bold tracking-[0.04em] text-accent">
                     WHY NOW
@@ -111,14 +129,21 @@ export default function SignalCard({
             </div>
             <div className="flex shrink-0 gap-[7px] max-md:w-full max-md:justify-between">
               {/* outreach-by / deadline chip — identical layout, label and value differ */}
-              <div className="min-w-[66px] rounded-[10px] border border-line bg-white/[0.04] px-[14px] py-[9px] text-center">
+              <div
+                className="min-w-[66px] rounded-[10px] border bg-white/[0.04] px-[14px] py-[9px] text-center"
+                style={
+                  signal.act_within_days <= 30
+                    ? { borderColor: "#FF8585", color: "#FF8585" }
+                    : signal.act_within_days <= 60
+                    ? { borderColor: "#FCD34D", color: "#FCD34D" }
+                    : { borderColor: "rgba(255,255,255,0.09)" }
+                }
+              >
                 <span className="block text-[18px] font-bold leading-none tracking-[-0.02em]">
-                  {isH2o
-                    ? formatRelativeDeadline(signal.deadline_date, signal.act_within_days)
-                    : formatDeadline(signal.deadline_date)}
+                  {formatRelativeDeadline(signal.deadline_date, signal.act_within_days)}
                 </span>
                 <span className="mt-[4px] block text-[6.5px] font-semibold uppercase tracking-[0.1em] text-txt-3">
-                  {isH2o ? "Outreach By" : "Deadline"}
+                  Outreach By
                 </span>
               </div>
               {/* volume chip: hidden for h2o (outreach-by already covers timing) */}
@@ -137,7 +162,6 @@ export default function SignalCard({
 
           {/* mid: act pill (hidden for h2o) + decision-makers */}
           <div className="mt-[15px] flex items-center gap-[12px] border-t border-line pt-[14px] max-md:flex-col max-md:items-start">
-            {!isH2o && <ActPill days={signal.act_within_days} />}
             <div className="min-w-0 flex-1">
               <div className="mb-[4px] text-[8px] font-bold uppercase tracking-[0.13em] text-txt-3">
                 Decision-makers to reach{anyEnriched ? " · enriched" : ""}
