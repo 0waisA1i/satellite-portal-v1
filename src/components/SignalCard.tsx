@@ -147,7 +147,7 @@ export default function SignalCard({
                 </span>
               </div>
               {/* volume chip: hidden for h2o (outreach-by already covers timing) */}
-              {!hideVolume && !isH2o && (
+              {false && !hideVolume && !isH2o && (
                 <div className="min-w-[66px] rounded-[10px] border border-line bg-white/[0.04] px-[14px] py-[9px] text-center">
                   <span className="block text-[13px] font-bold leading-none tracking-[-0.02em]">
                     {signal.est_volume}
