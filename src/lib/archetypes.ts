@@ -22,21 +22,9 @@ const ARCHETYPE_STYLES: Record<string, { accent: AccentName; tier: "gold" | "sil
   "Capacity / Infrastructure RFP": { accent: "lime", tier: "gold" },
   "Decarbonization Commitment": { accent: "cyan", tier: "silver" },
   "Initiative-Linked Hire": { accent: "grey", tier: "silver" },
-  // Live Kathairos archetypes (from icp_configs.config.archetypes).
-  "Pneumatic Methane Regulatory Deadline": { accent: "lime", tier: "gold" },
-  "Greenfield Pad / Well Permit": { accent: "mint", tier: "gold" },
-  "Operator-Linked Methane Plume / Enforcement": { accent: "cyan", tier: "silver" },
-  "Methane Programs Hiring + Public Commitment": { accent: "grey", tier: "silver" },
 };
 
-// Live `signals.archetype` is a code (A1..A4). Resolve to the human label we
-// render and key styling off of. Source: icp_configs.config.archetypes.
-export const CODE_TO_ARCHETYPE: Record<string, string> = {
-  A1: "Pneumatic Methane Regulatory Deadline",
-  A2: "Greenfield Pad / Well Permit",
-  A3: "Operator-Linked Methane Plume / Enforcement",
-  A4: "Methane Programs Hiring + Public Commitment",
-};
+export const CODE_TO_ARCHETYPE: Record<string, string> = {};
 
 export function archetypeLabel(codeOrName: string): string {
   return CODE_TO_ARCHETYPE[codeOrName] ?? codeOrName;

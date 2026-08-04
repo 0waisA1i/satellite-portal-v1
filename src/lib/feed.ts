@@ -86,7 +86,6 @@ function gate(
   const qualified = allSignals
     .filter(
       (s) =>
-        s.surfaced_at !== null &&
         s.status !== "expired" &&
         s.status !== "archived",
     )
