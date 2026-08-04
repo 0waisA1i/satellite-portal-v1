@@ -90,9 +90,7 @@ function mapRow(row: SignalRow): Signal {
     false_positive_filter: "", // TODO: pull from icp_configs.config.false_positive_filters per signal archetype
     rank_boost_flags: row.boost_flags ?? [],
     confidence_current: row.current_confidence,
-    // Always anchor to last_seen. The h2o "Outreach By" chip adds act_within_days
-    // as an offset; other clients display this as an absolute date ("Last Seen").
-    deadline_date: row.last_seen,
+    deadline_date: new Date().toISOString().slice(0, 10),
     act_within_days: actWithin,
     est_volume: "", // TODO: add est_volume column to signals table (pipeline stage 7 output)
     status: (row.status as Signal["status"]) ?? "active",
