@@ -34,15 +34,27 @@ function Sec({
   );
 }
 
+// Parses the structured why_now record and extracts just the Trigger line.
+// Falls back to the raw string if no Trigger: line is found (old format).
+function extractTrigger(whyNow: string): string {
+  const match = whyNow.match(/^Trigger:\s*(.+?)(?:\n|$)/m);
+  return match ? match[1].trim() : whyNow.split("\n")[0].trim();
+}
+
 function outreachDraft(s: VisibleSignal): string {
-  const greeting = s.contacts[0]?.name?.split(" ")[0] ?? "there";
-  return `Subject: ${s.why_now}: quick thought for ${s.account.name}
+  const firstName = s.contacts[0]?.name?.split(" ")[0] ?? "there";
+  const trigger = extractTrigger(s.why_now ?? "");
+  const company = s.account.name;
 
-Hi ${greeting},
+  return `Subject: ${company} — quick thought
 
-Saw ${s.account.name}'s ${s.trigger_label.toLowerCase()} (${s.archetype.toLowerCase()}). With ${s.why_now.toLowerCase()} on the clock, most teams in your position are weighing how to get to documented compliance fast without pulling ops off-cycle.
+Hi ${firstName},
 
-We've helped comparable operators turn exactly this trigger into a defensible plan in weeks, not quarters. Worth a 20-minute look at how it maps to your situation?
+${trigger} — that's the window.
+
+${s.outreach_angle ?? "We help cleantech operators turn this kind of trigger into pipeline before the window closes."}
+
+Worth a 20-minute conversation to see how it maps to your situation?
 
 Best,
 [Your name]`;
@@ -116,7 +128,7 @@ export default function DetailSheet({
                     {signal.account.name}
                   </div>
                   <div className="mt-[3px] text-[12.5px] text-txt-2">
-                    {signal.account.sector} · {signal.account.geo}
+                    {[signal.account.sector, signal.account.geo].filter(Boolean).join(" · ")}
                   </div>
                   <div className="mt-[15px] max-w-[260px]">
                     <div className="text-[7.5px] font-semibold uppercase tracking-[0.1em] text-txt-3">
@@ -183,8 +195,8 @@ export default function DetailSheet({
                   )}
                   {signal.why_now && (
                     <Sec num="3" title="Why now">
-                      <div className="text-[13.5px] leading-[1.6]">
-                        {signal.why_now}, act within {signal.act_within_days} days.
+                      <div className="whitespace-pre-line text-[13.5px] leading-[1.6] text-txt-2">
+                        {signal.why_now}
                       </div>
                     </Sec>
                   )}
@@ -239,44 +251,50 @@ export default function DetailSheet({
                       <dd>{signal.signal_id}</dd>
                       <dt className="font-semibold text-txt-3">Trigger</dt>
                       <dd>{signal.trigger_label}</dd>
-                      <dt className="font-semibold text-txt-3">
-                        Signal strength
-                      </dt>
+                      <dt className="font-semibold text-txt-3">Signal strength</dt>
                       <dd>{signal.confidence_current} / 100</dd>
                       <dt className="font-semibold text-txt-3">Act within</dt>
                       <dd>{signal.act_within_days} days</dd>
-                      <dt className="font-semibold text-txt-3">{isH2o ? "Outreach By" : "Deadline"}</dt>
-                      <dd>{isH2o ? formatRelativeDeadline(signal.deadline_date, signal.act_within_days) : signal.deadline_date}</dd>
-                      <dt className="font-semibold text-txt-3">Send Date</dt>
-                      <dd>{signal.send_date ? new Date(signal.send_date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "—"}</dd>
-                      <dt className="font-semibold text-txt-3">Grade</dt>
-                      <dd>{signal.enrichment_grade ?? "—"}</dd>
+                      <dt className="font-semibold text-txt-3">Outreach By</dt>
+                      <dd>{formatRelativeDeadline(signal.deadline_date, signal.act_within_days)}</dd>
+                      {signal.send_date && (
+                        <>
+                          <dt className="font-semibold text-txt-3">Send Date</dt>
+                          <dd>{new Date(signal.send_date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</dd>
+                        </>
+                      )}
+                      {signal.enrichment_grade && (
+                        <>
+                          <dt className="font-semibold text-txt-3">Grade</dt>
+                          <dd>{signal.enrichment_grade}</dd>
+                        </>
+                      )}
                     </dl>
                   </Sec>
-                  <Sec num="7" title="Rank-boost flags">
-                    <div className="flex flex-wrap gap-[6px]">
-                      {signal.rank_boost_flags.map((f) => (
-                        <span
-                          key={f}
-                          className="rounded-[7px] border border-mint/15 bg-mint/5 px-[9px] py-[4px] text-[10px] font-semibold text-mint"
-                        >
-                          {f}
-                        </span>
-                      ))}
-                    </div>
-                  </Sec>
-                  <Sec num="8" title="False-positive filter" last>
-                    <div className="text-[13.5px] leading-[1.6] text-txt-2">
-                      {signal.false_positive_filter ? (
-                        <>
-                          <span className="text-[10px] font-bold uppercase tracking-[0.08em] text-alert">
-                            Suppressed →{" "}
+                  {signal.rank_boost_flags.length > 0 && (
+                    <Sec num="7" title="Rank-boost flags">
+                      <div className="flex flex-wrap gap-[6px]">
+                        {signal.rank_boost_flags.map((f) => (
+                          <span
+                            key={f}
+                            className="rounded-[7px] border border-mint/15 bg-mint/5 px-[9px] py-[4px] text-[10px] font-semibold text-mint"
+                          >
+                            {f}
                           </span>
-                          {signal.false_positive_filter}
-                        </>
-                      ) : "—"}
-                    </div>
-                  </Sec>
+                        ))}
+                      </div>
+                    </Sec>
+                  )}
+                  {signal.false_positive_filter && (
+                    <Sec num="8" title="False-positive filter" last>
+                      <div className="text-[13.5px] leading-[1.6] text-txt-2">
+                        <span className="text-[10px] font-bold uppercase tracking-[0.08em] text-alert">
+                          Suppressed →{" "}
+                        </span>
+                        {signal.false_positive_filter}
+                      </div>
+                    </Sec>
+                  )}
                 </>
               ) : (
                 <>
@@ -307,11 +325,6 @@ export default function DetailSheet({
                       </button>
                     </div>
                   </Sec>
-                  <div className="py-[18px] text-[11.5px] text-txt-3">
-                    Stub draft. In production this is generated per-signal from
-                    the trigger, the account context, and your messaging
-                    guardrails (Stage 10).
-                  </div>
                 </>
               )}
             </div>
