@@ -99,26 +99,28 @@ export default function SignalCard({
                 ) : null;
               })()}
               <div className="mt-[11px] flex flex-col items-start gap-[9px]">
-                <span className="rounded-full border border-line-2 bg-panel px-[10px] py-[3px] text-[9.5px] font-semibold uppercase tracking-[0.05em] text-txt-2">
-                  {signal.trigger_label}
-                </span>
-                {signal.enrichment_grade && (() => {
-                  const g = signal.enrichment_grade;
-                  const style =
-                    g === "STRONG" ? { color: "#CBF3BA", borderColor: "#CBF3BA40", background: "#CBF3BA0d" } :
-                    g === "PARTIAL" ? { color: "#FCD34D", borderColor: "#FCD34D40", background: "#FCD34D0d" } :
-                    g === "THIN"    ? { color: "#FB923C", borderColor: "#FB923C40", background: "#FB923C0d" } :
-                    g === "GATE"    ? { color: "#FF8585", borderColor: "#FF858540", background: "#FF85850d" } :
-                    null;
-                  return style ? (
-                    <span
-                      className="rounded-full border px-[10px] py-[3px] text-[9.5px] font-semibold uppercase tracking-[0.05em]"
-                      style={style}
-                    >
-                      {g}
-                    </span>
-                  ) : null;
-                })()}
+                <div className="flex items-center gap-[6px]">
+                  <span className="rounded-full border border-line-2 bg-panel px-[10px] py-[3px] text-[9.5px] font-semibold uppercase tracking-[0.05em] text-txt-2">
+                    {signal.trigger_label}
+                  </span>
+                  {signal.enrichment_grade && (() => {
+                    const g = signal.enrichment_grade;
+                    const style =
+                      g === "STRONG" ? { color: "#CBF3BA", borderColor: "#CBF3BA40", background: "#CBF3BA0d" } :
+                      g === "PARTIAL" ? { color: "#FCD34D", borderColor: "#FCD34D40", background: "#FCD34D0d" } :
+                      g === "THIN"    ? { color: "#FB923C", borderColor: "#FB923C40", background: "#FB923C0d" } :
+                      g === "GATE"    ? { color: "#FF8585", borderColor: "#FF858540", background: "#FF85850d" } :
+                      null;
+                    return style ? (
+                      <span
+                        className="rounded-full border px-[10px] py-[3px] text-[9.5px] font-semibold uppercase tracking-[0.05em]"
+                        style={style}
+                      >
+                        {g}
+                      </span>
+                    ) : null;
+                  })()}
+                </div>
                 <span className="text-[9.5px] text-txt-3">
                   <b className="font-bold tracking-[0.04em] text-accent">
                     WHY NOW
