@@ -34,31 +34,7 @@ function Sec({
   );
 }
 
-// Parses the structured why_now record and extracts just the Trigger line.
-// Falls back to the raw string if no Trigger: line is found (old format).
-function extractTrigger(whyNow: string): string {
-  const match = whyNow.match(/^Trigger:\s*(.+?)(?:\n|$)/m);
-  return match ? match[1].trim() : whyNow.split("\n")[0].trim();
-}
 
-function outreachDraft(s: VisibleSignal): string {
-  const firstName = s.contacts[0]?.name?.split(" ")[0] ?? "there";
-  const trigger = extractTrigger(s.why_now ?? "");
-  const company = s.account.name;
-
-  return `Subject: ${company} — quick thought
-
-Hi ${firstName},
-
-${trigger} — that's the window.
-
-${s.outreach_angle ?? "We help cleantech operators turn this kind of trigger into pipeline before the window closes."}
-
-Worth a 20-minute conversation to see how it maps to your situation?
-
-Best,
-[Your name]`;
-}
 
 export default function DetailSheet({
   signal,
@@ -305,14 +281,16 @@ export default function DetailSheet({
                   </Sec>
                   <Sec num="✎" title="Draft email">
                     <pre className="whitespace-pre-wrap rounded-[10px] border border-line bg-white/[0.03] p-[16px] font-sans text-[13px] leading-[1.6]">
-                      {outreachDraft(signal)}
+                      {signal.draft_email ?? "No draft — signal is not STRONG or PARTIAL grade."}
                     </pre>
                     <div className="mt-[12px] flex gap-[9px]">
                       <button
                         className={btnAccent}
                         onClick={() => {
-                          navigator.clipboard.writeText(outreachDraft(signal));
-                          onToast("Copied to clipboard");
+                          if (signal.draft_email) {
+                            navigator.clipboard.writeText(signal.draft_email);
+                            onToast("Copied to clipboard");
+                          }
                         }}
                       >
                         Copy
