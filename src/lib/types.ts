@@ -81,6 +81,7 @@ export interface VisibleContact {
 
 export type VisibleSignal = Omit<Signal, "contacts"> & {
   contacts: VisibleContact[];
+  draft_email: string | null;
 };
 
 export interface FeedStats {

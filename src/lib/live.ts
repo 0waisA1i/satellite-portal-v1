@@ -100,6 +100,7 @@ function mapRow(row: SignalRow): Signal {
     surfaced_at: row.surfaced_at ?? null,
     enrichment_grade: row.enrichment_grade ?? null,
     send_date: row.send_date ?? null,
+    draft_email: row.draft_email ?? null,
     surfaced_period: "", // set by caller to the current period
     contacts: [], // TODO: wire enrichment — query contacts table via fetchContactsForSignal
   };
